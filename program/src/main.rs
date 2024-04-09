@@ -48,6 +48,7 @@ fn main() {
     println!("cycle-tracker-start: verify");
     let vp = ProdVerifier::default();
     let opt = Options {
+        // TODO: Configure this threshold.
         trust_threshold: Default::default(),
         // 21 day unbonding period, set trusting period to 14 days.
         trusting_period: Duration::from_secs(60 * 60 * 24 * 14),
