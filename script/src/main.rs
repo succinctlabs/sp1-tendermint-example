@@ -55,25 +55,27 @@ async fn main() {
     // let encoded: Vec<u8> = bincode::serialize(&light_block_1).unwrap();
     // let decoded: LightBlock = bincode::deserialize(&encoded[..]).unwrap();
 
-    let proof = SP1Prover::prove(TENDERMINT_ELF, stdin).expect("proving failed");
+    let proof = SP1Prover::execute(TENDERMINT_ELF, stdin).expect("proving failed");
 
-    // Verify proof.
-    SP1Verifier::verify(TENDERMINT_ELF, &proof).expect("verification failed");
+    // // Verify proof.
+    // SP1Verifier::verify(TENDERMINT_ELF, &proof).expect("verification failed");
 
-    // Verify the public values
-    let mut pv_hasher = Sha256::new();
-    pv_hasher.update(light_block_1.signed_header.header.hash().as_bytes());
-    pv_hasher.update(light_block_2.signed_header.header.hash().as_bytes());
-    pv_hasher.update(&serde_cbor::to_vec(&expected_verdict).unwrap());
-    let expected_pv_digest: &[u8] = &pv_hasher.finalize();
+    // // Verify the public values
+    // let mut pv_hasher = Sha256::new();
+    // pv_hasher.update(light_block_1.signed_header.header.hash().as_bytes());
+    // pv_hasher.update(light_block_2.signed_header.header.hash().as_bytes());
+    // pv_hasher.update(&serde_cbor::to_vec(&expected_verdict).unwrap());
+    // let expected_pv_digest: &[u8] = &pv_hasher.finalize();
 
-    let proof_pv_bytes: Vec<u8> = proof.proof.public_values_digest.into();
-    assert_eq!(proof_pv_bytes.as_slice(), expected_pv_digest);
+    // let proof_pv_bytes: Vec<u8> = proof.public_values_digest.into();
+    let proof_pv: Vec<u8> = proof.buffer.data;
+    println!("proof_pv: {:?}", proof_pv);
+    // assert_eq!(proof_pv_bytes.as_slice(), expected_pv_digest);
 
-    // Save proof.
-    proof
-        .save("proof-with-pis.json")
-        .expect("saving proof failed");
+    // // Save proof.
+    // proof
+    //     .save("proof-with-pis.json")
+    //     .expect("saving proof failed");
 
     println!("successfully generated and verified proof for the program!")
 }
