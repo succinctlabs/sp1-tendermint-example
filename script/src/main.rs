@@ -4,6 +4,7 @@ use reqwest::Client;
 use sp1_sdk::{utils, ProverClient, PublicValues, SP1Stdin};
 
 use sha2::{Digest, Sha256};
+use subtle_encoding::hex;
 use tendermint_light_client_verifier::options::Options;
 use tendermint_light_client_verifier::types::LightBlock;
 use tendermint_light_client_verifier::ProdVerifier;
@@ -50,6 +51,17 @@ fn main() {
 
     let expected_verdict = verify_blocks(light_block_1.clone(), light_block_2.clone());
 
+    let header_hash_1 = light_block_1.signed_header.header.hash();
+    let header_hash_2 = light_block_2.signed_header.header.hash();
+    println!(
+        "Header hash 1: {:?}",
+        String::from_utf8(hex::encode(header_hash_1.as_bytes()))
+    );
+    println!(
+        "Header hash 2: {:?}",
+        String::from_utf8(hex::encode(header_hash_2.as_bytes()))
+    );
+
     let mut stdin = SP1Stdin::new();
 
     let encoded_1 = serde_cbor::to_vec(&light_block_1).unwrap();
@@ -72,9 +84,6 @@ fn main() {
         .verify(TENDERMINT_ELF, &proof)
         .expect("verification failed");
 
-    let header_hash_1 = light_block_1.signed_header.header.hash();
-    let header_hash_2 = light_block_2.signed_header.header.hash();
-
     // Find the index of the header hash in the public values, given that they're both length 32 bytes.
     let mut header_hash_1_idx = 0;
     let mut header_hash_2_idx = 0;
@@ -86,6 +95,10 @@ fn main() {
             header_hash_2_idx = i;
         }
     }
+    println!(
+        "Public Values: {:?}",
+        String::from_utf8(hex::encode(proof.public_values.buffer.clone().data))
+    );
 
     println!("Header hash 1 index: {}", header_hash_1_idx);
     println!("Header hash 2 index: {}", header_hash_2_idx);

@@ -11,10 +11,15 @@ contract SP1TendermintTest is Test {
 
     function setUp() public {
         verifier = new DummyVerifier();
-        sp1 = new SP1Tendermint(address(verifier), 10, bytes32("aa"));
+        bytes32 trustedBlockHash = 0x41410655235f653628714eecd34b317e60b26ee3eae9127a13c2dd88f0e2a291;
+        sp1 = new SP1Tendermint(address(verifier), 10, trustedBlockHash);
     }
 
     function test_addNewBlockHash() public {
-        sp1.skip(10, bytes(""), bytes(""));
+        sp1.skip(
+            10,
+            hex"41410655235f653628714eecd34b317e60b26ee3eae9127a13c2dd88f0e2a2918f988d0d730aef11ae9c4f3cd9adfb3b6aac94a20948f037beeac22f8df362586753756363657373",
+            bytes("")
+        );
     }
 }

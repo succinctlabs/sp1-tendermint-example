@@ -19,6 +19,7 @@ itertools = "0.12.1"
 serde_cbor = "0.11.2"
 sha2 = "0.10.8"
 dotenv = "0.15.0"
+subtle-encoding = "0.5.1"
 
 [build-dependencies]
 sp1-helper = { git = "https://github.com/succinctlabs/sp1.git" }

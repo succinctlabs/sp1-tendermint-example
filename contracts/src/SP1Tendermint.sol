@@ -30,6 +30,14 @@ contract SP1Tendermint {
             revert("Trusted height is greater than the latest height");
         }
 
-        verifier.verify(blockHashes[_trustedHeight], _publicValues, _proof);
+        // Verify the first 32 bytes of the public values match the trusted block hash.
+        bytes32 trustedBlockHash = blockHashes[_trustedHeight];
+        // Extract the first 32 bytes of the public values.
+        bytes memory _publicValues32 = _publicValues[0:32];
+        if (trustedBlockHash != bytes32(_publicValues32)) {
+            revert("Trusted block hash and public values do not match");
+        }
+
+        verifier.verify(trustedBlockHash, _publicValues, _proof);
     }
 }
