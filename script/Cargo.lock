@@ -1322,6 +1322,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "dotenv"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "77c90badedccf4105eca100756a0b1289e191f6fcbdadd3cee1d2f614f97da8f"
+
+[[package]]
 name = "downcast-rs"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3894,7 +3900,7 @@ dependencies = [
 [[package]]
 name = "sp1-core"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/sp1.git#4c13b3ffe938ac8e6d23ab3701b0fe9e70a03aaa"
+source = "git+https://github.com/succinctlabs/sp1.git#713d2cdf57f91ac73ed0e765f4bb279ab6abb08f"
 dependencies = [
  "anyhow",
  "bincode",
@@ -3958,7 +3964,7 @@ dependencies = [
 [[package]]
 name = "sp1-derive"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/sp1.git#4c13b3ffe938ac8e6d23ab3701b0fe9e70a03aaa"
+source = "git+https://github.com/succinctlabs/sp1.git#713d2cdf57f91ac73ed0e765f4bb279ab6abb08f"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3968,7 +3974,7 @@ dependencies = [
 [[package]]
 name = "sp1-helper"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/sp1.git#4c13b3ffe938ac8e6d23ab3701b0fe9e70a03aaa"
+source = "git+https://github.com/succinctlabs/sp1.git#713d2cdf57f91ac73ed0e765f4bb279ab6abb08f"
 dependencies = [
  "cargo_metadata",
  "chrono",
@@ -3977,7 +3983,7 @@ dependencies = [
 [[package]]
 name = "sp1-precompiles"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/sp1.git#4c13b3ffe938ac8e6d23ab3701b0fe9e70a03aaa"
+source = "git+https://github.com/succinctlabs/sp1.git#713d2cdf57f91ac73ed0e765f4bb279ab6abb08f"
 dependencies = [
  "anyhow",
  "bincode",
@@ -3991,7 +3997,7 @@ dependencies = [
 [[package]]
 name = "sp1-sdk"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/sp1.git#4c13b3ffe938ac8e6d23ab3701b0fe9e70a03aaa"
+source = "git+https://github.com/succinctlabs/sp1.git#713d2cdf57f91ac73ed0e765f4bb279ab6abb08f"
 dependencies = [
  "alloy",
  "anyhow",
@@ -4021,7 +4027,7 @@ dependencies = [
 [[package]]
 name = "sp1-zkvm"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/sp1.git#4c13b3ffe938ac8e6d23ab3701b0fe9e70a03aaa"
+source = "git+https://github.com/succinctlabs/sp1.git#713d2cdf57f91ac73ed0e765f4bb279ab6abb08f"
 dependencies = [
  "bincode",
  "cfg-if",
@@ -4262,6 +4268,7 @@ name = "tendermint-script"
 version = "0.1.0"
 dependencies = [
  "bincode",
+ "dotenv",
  "itertools 0.12.1",
  "reqwest 0.11.27",
  "serde",

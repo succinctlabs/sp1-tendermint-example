@@ -9,6 +9,7 @@ use tendermint_light_client_verifier::types::LightBlock;
 use tendermint_light_client_verifier::ProdVerifier;
 use tendermint_light_client_verifier::Verdict;
 use tendermint_light_client_verifier::Verifier;
+use tokio::runtime;
 
 use crate::util::fetch_latest_commit;
 use crate::util::fetch_light_block;
@@ -16,10 +17,7 @@ use crate::util::fetch_light_block;
 const TENDERMINT_ELF: &[u8] = include_bytes!("../../program/elf/riscv32im-succinct-zkvm-elf");
 mod util;
 
-#[tokio::main]
-async fn main() {
-    // Generate proof.
-    utils::setup_logger();
+async fn get_light_blocks() -> (LightBlock, LightBlock) {
     // Uniquely identify a peer in the network.
     let peer_id: [u8; 20] = [
         0x72, 0x6b, 0xc8, 0xd2, 0x60, 0x38, 0x7c, 0xf5, 0x6e, 0xcf, 0xad, 0x3a, 0x6b, 0xf6, 0xfe,
@@ -35,10 +33,20 @@ async fn main() {
     let light_block_1 = fetch_light_block(block - 20, peer_id, BASE_URL)
         .await
         .expect("Failed to generate light block 1");
-
     let light_block_2 = fetch_light_block(block, peer_id, BASE_URL)
         .await
         .expect("Failed to generate light block 2");
+    (light_block_1, light_block_2)
+}
+
+fn main() {
+    dotenv::dotenv().ok();
+    // Generate proof.
+    utils::setup_logger();
+
+    // Use tokio runtime to get the light blocks.
+    let rt = runtime::Runtime::new().unwrap();
+    let (light_block_1, light_block_2) = rt.block_on(async { get_light_blocks().await });
 
     let expected_verdict = verify_blocks(light_block_1.clone(), light_block_2.clone());
 
@@ -56,12 +64,31 @@ async fn main() {
     // let decoded: LightBlock = bincode::deserialize(&encoded[..]).unwrap();
 
     let client = ProverClient::new();
+
     let proof = client.prove(TENDERMINT_ELF, stdin).expect("proving failed");
 
     // Verify proof.
     client
         .verify(TENDERMINT_ELF, &proof)
         .expect("verification failed");
+
+    let header_hash_1 = light_block_1.signed_header.header.hash();
+    let header_hash_2 = light_block_2.signed_header.header.hash();
+
+    // Find the index of the header hash in the public values, given that they're both length 32 bytes.
+    let mut header_hash_1_idx = 0;
+    let mut header_hash_2_idx = 0;
+    for i in 0..proof.public_values.buffer.data.len() - 32 {
+        if proof.public_values.buffer.data[i..i + 32] == header_hash_1.as_bytes().to_vec() {
+            header_hash_1_idx = i;
+        }
+        if proof.public_values.buffer.data[i..i + 32] == header_hash_2.as_bytes().to_vec() {
+            header_hash_2_idx = i;
+        }
+    }
+
+    println!("Header hash 1 index: {}", header_hash_1_idx);
+    println!("Header hash 2 index: {}", header_hash_2_idx);
 
     // Verify the public values
     let mut pv_hasher = Sha256::new();

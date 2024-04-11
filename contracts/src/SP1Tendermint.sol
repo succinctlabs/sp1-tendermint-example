@@ -10,13 +10,19 @@ contract SP1Tendermint {
     uint256 latestHeight;
     mapping(uint256 => bytes32) blockHashes;
 
-    constructor(address _verifier) {
+    constructor(
+        address _verifier,
+        uint256 _initialHeight,
+        bytes32 _initialBlockHash
+    ) {
         verifier = INetworkVerifier(_verifier);
+        latestHeight = _initialHeight;
+        latestBlockHash = _initialBlockHash;
+        blockHashes[_initialHeight] = _initialBlockHash;
     }
 
     function skip(
         uint256 _trustedHeight,
-        bytes32 _trustedBlockHash,
         bytes calldata _publicValues,
         bytes calldata _proof
     ) public {
@@ -24,11 +30,6 @@ contract SP1Tendermint {
             revert("Trusted height is greater than the latest height");
         }
 
-        bytes32 trustedBlockHash = blockHashes[_trustedHeight];
-        if (trustedBlockHash != _trustedBlockHash) {
-            revert("Trusted block hash is not equal to the trusted height");
-        }
-
-        verifier.verify(bytes32(0), _publicValues, _proof);
+        verifier.verify(blockHashes[_trustedHeight], _publicValues, _proof);
     }
 }
