@@ -10,10 +10,23 @@ use tendermint_light_client_verifier::types::LightBlock;
 use tendermint_light_client_verifier::ProdVerifier;
 use tendermint_light_client_verifier::Verdict;
 use tendermint_light_client_verifier::Verifier;
-use tokio::runtime;
 
 use crate::util::fetch_latest_commit;
 use crate::util::fetch_light_block;
+
+use alloy::sol;
+
+sol! {
+    contract SP1Tendermint {
+        uint256 latestHeight;
+
+        function update(
+            uint256 _trustedHeight,
+            bytes calldata _publicValues,
+            bytes calldata _proof
+        );
+    }
+}
 
 const TENDERMINT_ELF: &[u8] = include_bytes!("../../program/elf/riscv32im-succinct-zkvm-elf");
 mod util;
@@ -40,14 +53,13 @@ async fn get_light_blocks() -> (LightBlock, LightBlock) {
     (light_block_1, light_block_2)
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     dotenv::dotenv().ok();
     // Generate proof.
     utils::setup_logger();
 
-    // Use tokio runtime to get the light blocks.
-    let rt = runtime::Runtime::new().unwrap();
-    let (light_block_1, light_block_2) = rt.block_on(async { get_light_blocks().await });
+    let (light_block_1, light_block_2) = get_light_blocks().await;
 
     let expected_verdict = verify_blocks(light_block_1.clone(), light_block_2.clone());
 
@@ -77,31 +89,15 @@ fn main() {
 
     let client = ProverClient::new();
 
-    let proof = client.prove(TENDERMINT_ELF, stdin).expect("proving failed");
+    let proof = client
+        .prove_remote_async(TENDERMINT_ELF, stdin)
+        .await
+        .expect("proving failed");
 
     // Verify proof.
     client
         .verify(TENDERMINT_ELF, &proof)
         .expect("verification failed");
-
-    // Find the index of the header hash in the public values, given that they're both length 32 bytes.
-    let mut header_hash_1_idx = 0;
-    let mut header_hash_2_idx = 0;
-    for i in 0..proof.public_values.buffer.data.len() - 32 {
-        if proof.public_values.buffer.data[i..i + 32] == header_hash_1.as_bytes().to_vec() {
-            header_hash_1_idx = i;
-        }
-        if proof.public_values.buffer.data[i..i + 32] == header_hash_2.as_bytes().to_vec() {
-            header_hash_2_idx = i;
-        }
-    }
-    println!(
-        "Public Values: {:?}",
-        String::from_utf8(hex::encode(proof.public_values.buffer.clone().data))
-    );
-
-    println!("Header hash 1 index: {}", header_hash_1_idx);
-    println!("Header hash 2 index: {}", header_hash_2_idx);
 
     // Verify the public values
     let mut pv_hasher = Sha256::new();
@@ -116,6 +112,8 @@ fn main() {
         public_values.commit_digest_bytes().as_slice(),
         expected_pv_digest
     );
+
+    // Discard the proof bytes for now and update the
 
     // Save proof.
     proof
