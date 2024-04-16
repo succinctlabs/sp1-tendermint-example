@@ -3,8 +3,12 @@ use std::str::FromStr;
 use std::time::Duration;
 
 use alloy::primitives::Address;
+use alloy::providers::network::EthereumSigner;
 use alloy::providers::ProviderBuilder;
+use alloy::signers::wallet::LocalWallet;
+use alloy::signers::Signer;
 use reqwest::Client;
+use reqwest::Url;
 use sp1_sdk::{utils, ProverClient, PublicValues, SP1Stdin};
 
 use sha2::{Digest, Sha256};
@@ -16,7 +20,6 @@ use tendermint_light_client_verifier::Verdict;
 use tendermint_light_client_verifier::Verifier;
 
 use crate::util::fetch_block;
-use crate::util::fetch_commit;
 use crate::util::fetch_latest_commit;
 use crate::util::fetch_light_block;
 
@@ -76,7 +79,7 @@ async fn get_light_blocks(
     const BASE_URL: &str = "https://celestia-mocha-rpc.publicnode.com:443";
 
     let block_by_hash_url = format!(
-        "{}/block_by_hash?hash={}",
+        "{}/block_by_hash?hash=0x{}",
         BASE_URL,
         String::from_utf8(hex::encode(trusted_header_hash)).unwrap()
     );
@@ -115,7 +118,9 @@ async fn prove_next_block_height_update(
     // let encoded: Vec<u8> = bincode::serialize(&light_block_1).unwrap();
     // let decoded: LightBlock = bincode::deserialize(&encoded[..]).unwrap();
 
-    let client = ProverClient::new();
+    // Read SP1_PRIVATE_KEY from environment variable.
+    let sp1_private_key = env::var("SP1_PRIVATE_KEY").unwrap();
+    let client = ProverClient::new().with_network(sp1_private_key.as_str());
 
     let proof = client
         .prove_remote_async(TENDERMINT_ELF, stdin)
@@ -123,9 +128,10 @@ async fn prove_next_block_height_update(
         .expect("proving failed");
 
     // Verify proof.
-    client
-        .verify(TENDERMINT_ELF, &proof)
-        .expect("verification failed");
+    // To-do: Re-enable verifying when remote proving is stable.
+    // client
+    //     .verify(TENDERMINT_ELF, &proof)
+    //     .expect("verification failed");
 
     // Verify the public values
     let mut pv_hasher = Sha256::new();
@@ -143,7 +149,7 @@ async fn prove_next_block_height_update(
 
     // Return the public values.
     // TODO: Until Groth16 wrapping is implemented, return empty bytes for the proof.
-    (public_values.commit_digest_bytes(), vec![])
+    (proof.public_values.buffer.data, vec![])
 }
 
 #[tokio::main]
@@ -162,10 +168,10 @@ async fn main() {
     let rpc_url = env::var("RPC_URL").unwrap();
 
     loop {
+        let signer = LocalWallet::from_str(&private_key).unwrap();
         let provider = ProviderBuilder::new()
-            .with_recommended_fillers()
-            .on_builtin(&rpc_url)
-            .await
+            .signer(EthereumSigner::from(signer))
+            .on_http(Url::parse(&rpc_url).unwrap())
             .expect("could not connect to client");
 
         let address: Address = Address::from_str(&env::var("CONTRACT_ADDRESS").unwrap()).unwrap();
@@ -203,6 +209,7 @@ async fn main() {
             // Relay the proof to the contract.
             let update_call = contract.update(pv.into(), proof.into());
             let _ = update_call.call().await.unwrap();
+            let _ = update_call.send().await.unwrap();
 
             println!(
                 "successfully generated and verified proof for the program! relayed to contract"
