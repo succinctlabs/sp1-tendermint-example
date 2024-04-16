@@ -5,7 +5,7 @@ name = "tendermint-operator"
 edition = "2021"
 
 [dependencies]
-sp1-sdk = { git = "https://github.com/succinctlabs/sp1.git" }
+sp1-sdk = { git = "https://github.com/succinctlabs/sp1.git", rev = "7a57682bfd3afb33c6e1320d5723a851d42dd298" }
 reqwest = { version = "0.11", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
@@ -29,4 +29,4 @@ alloy = { git = "https://github.com/alloy-rs/alloy", features = [
 ] }
 ethers = "2.0.14"
 [build-dependencies]
-sp1-helper = { git = "https://github.com/succinctlabs/sp1.git" }
+sp1-helper = { git = "https://github.com/succinctlabs/sp1.git", rev = "7a57682bfd3afb33c6e1320d5723a851d42dd298" }

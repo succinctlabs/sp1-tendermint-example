@@ -134,9 +134,11 @@ async fn prove_next_block_height_update(
 
     // Verify proof.
     // To-do: Re-enable verifying when remote proving is stable.
-    // client
-    //     .verify(TENDERMINT_ELF, &proof)
-    //     .expect("verification failed");
+    client
+        .verify(TENDERMINT_ELF, &proof)
+        .expect("verification failed");
+
+    println!("Successfully verified proof!");
 
     // Verify the public values
     let mut pv_hasher = Sha256::new();
