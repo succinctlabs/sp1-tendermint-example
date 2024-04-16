@@ -4955,9 +4955,9 @@ checksum = "cd0b0ec5f1c1ca621c432a25813d8d60c88abe6d3e08a3eb9cf37d97a0fe3d73"
 
 [[package]]
 name = "serde"
-version = "1.0.197"
+version = "1.0.198"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3fb1c873e1b9b056a4dc4c0c198b24c3ffa059243875552b2bd0933b1aee4ce2"
+checksum = "9846a40c979031340571da2545a4e5b7c4163bdae79b301d5f86d03979451fcc"
 dependencies = [
  "serde_derive",
 ]
@@ -4983,9 +4983,9 @@ dependencies = [
 
 [[package]]
 name = "serde_derive"
-version = "1.0.197"
+version = "1.0.198"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7eb0b34b42edc17f6b7cac84a52a1c5f0e1bb2227e997ca9011ea3dd34e8610b"
+checksum = "e88edab869b01783ba905e7d0153f9fc1a6505a96e4ad3018011eedb838566d9"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -5249,7 +5249,7 @@ dependencies = [
 [[package]]
 name = "sp1-core"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/sp1.git#ad2993acc22da0ee3659d168ede48cc9f6c870a2"
+source = "git+https://github.com/succinctlabs/sp1.git#7a57682bfd3afb33c6e1320d5723a851d42dd298"
 dependencies = [
  "anyhow",
  "arrayref",
@@ -5315,7 +5315,7 @@ dependencies = [
 [[package]]
 name = "sp1-derive"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/sp1.git#ad2993acc22da0ee3659d168ede48cc9f6c870a2"
+source = "git+https://github.com/succinctlabs/sp1.git#7a57682bfd3afb33c6e1320d5723a851d42dd298"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -5325,7 +5325,7 @@ dependencies = [
 [[package]]
 name = "sp1-helper"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/sp1.git#ad2993acc22da0ee3659d168ede48cc9f6c870a2"
+source = "git+https://github.com/succinctlabs/sp1.git#7a57682bfd3afb33c6e1320d5723a851d42dd298"
 dependencies = [
  "cargo_metadata",
  "chrono",
@@ -5334,7 +5334,7 @@ dependencies = [
 [[package]]
 name = "sp1-primitives"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/sp1.git#ad2993acc22da0ee3659d168ede48cc9f6c870a2"
+source = "git+https://github.com/succinctlabs/sp1.git#7a57682bfd3afb33c6e1320d5723a851d42dd298"
 dependencies = [
  "itertools 0.12.1",
  "lazy_static",
@@ -5347,7 +5347,7 @@ dependencies = [
 [[package]]
 name = "sp1-sdk"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/sp1.git#ad2993acc22da0ee3659d168ede48cc9f6c870a2"
+source = "git+https://github.com/succinctlabs/sp1.git#7a57682bfd3afb33c6e1320d5723a851d42dd298"
 dependencies = [
  "alloy 0.1.0 (git+https://github.com/alloy-rs/alloy?rev=bfd0fda)",
  "anyhow",

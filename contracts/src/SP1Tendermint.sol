@@ -26,21 +26,23 @@ contract SP1Tendermint {
         verifier = INetworkVerifier(_verifier);
     }
 
-    function update(
-        bytes calldata _publicValues,
-        bytes calldata _proof
+    function updateHeader(
+        bytes calldata publicValues,
+        bytes calldata proof
     ) public {
         // Extract the first 32 bytes of the public values.
-        bytes memory proofTrustedHeader = _publicValues[0:32];
+        bytes memory proofTrustedHeader = publicValues[0:32];
         if (bytes32(proofTrustedHeader) != latestHeader) {
             revert("Trusted block hash and public values do not match");
         }
 
         /// @dev In the dummy verifier, the program hash and proof are not used.
-        verifier.verify(tendermintProgramHash, _publicValues, _proof);
+        // Verify the proof with the associated public values.
+        verifier.verify(tendermintProgramHash, publicValues, proof);
 
-        /// Once the proof is verified, the next 32 bytes are the new trusted block hash.
-        bytes memory proofNewHeader = _publicValues[32:64];
+        /// The next 32 bytes of the public values are the new trusted block hash. Set the latest
+        // header to the new header.
+        bytes memory proofNewHeader = publicValues[32:64];
         latestHeader = bytes32(proofNewHeader);
     }
 }

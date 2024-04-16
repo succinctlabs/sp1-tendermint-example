@@ -164,7 +164,7 @@ async fn main() {
     utils::setup_logger();
 
     // BLOCK_INTERVAL defines which block to update to next.
-    let block_interval: u64 = 10;
+    let block_interval: u64 = 100;
 
     // Read private key from environment variable.
     let private_key = env::var("PRIVATE_KEY").unwrap();
