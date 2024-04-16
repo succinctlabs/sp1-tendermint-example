@@ -4,9 +4,9 @@ version = 3
 
 [[package]]
 name = "anyhow"
-version = "1.0.81"
+version = "1.0.82"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0952808a6c2afd1aa8947271f3a60f1a6763c7b912d210184c5149b5cf147247"
+checksum = "f538837af36e6f6a9be0faa67f9a314f8119e4e4b5867c6ab40ed60360142519"
 
 [[package]]
 name = "autocfg"
@@ -218,7 +218,7 @@ dependencies = [
  "curve25519-dalek-ng",
  "hex",
  "rand_core",
- "sha2 0.9.9",
+ "sha2 0.9.8",
  "zeroize",
 ]
 
@@ -348,9 +348,9 @@ dependencies = [
 
 [[package]]
 name = "getrandom"
-version = "0.2.12"
+version = "0.2.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "190092ea657667030ac6a35e305e62fc4dd69fd98ac98631e5d3a2b1575a12b5"
+checksum = "94b22e06ecb0110981051723910cbf0b5f5e09a2062dd7663334ee79a9d1286c"
 dependencies = [
  "cfg-if",
  "libc",
@@ -551,9 +551,9 @@ dependencies = [
 
 [[package]]
 name = "quote"
-version = "1.0.35"
+version = "1.0.36"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "291ec9ab5efd934aaf503a6466c5d5251535d108ee747472c3977cc5acc868ef"
+checksum = "0fa76aaf39101c457836aec0ce2316dbdc3ab723cdda1c6bd4e6ad4208acaca7"
 dependencies = [
  "proc-macro2",
 ]
@@ -676,9 +676,9 @@ dependencies = [
 
 [[package]]
 name = "serde_repr"
-version = "0.1.18"
+version = "0.1.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b2e6b945e9d3df726b65d6ee24060aff8e3533d431f677a9695db04eff9dfdb"
+checksum = "6c64451ba24fc7a6a2d60fc75dd9c83c90903b19028d4eff35e88fc1e86564e9"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -687,9 +687,8 @@ dependencies = [
 
 [[package]]
 name = "sha2"
-version = "0.9.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4d58a1e1bf39749807d89cf2d98ac2dfa0ff1cb3faa38fbb64dd88ac8013d800"
+version = "0.9.8"
+source = "git+https://github.com/sp1-patches/RustCrypto-hashes?branch=patch-v0.9.8#0b578688db61bb53e15353f5beaa2c11ad93f037"
 dependencies = [
  "block-buffer 0.9.0",
  "cfg-if",
@@ -722,7 +721,7 @@ dependencies = [
 [[package]]
 name = "sp1-precompiles"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/sp1.git#c454f8950bef85c5619e405ed1909d1ceae59028"
+source = "git+https://github.com/succinctlabs/sp1.git#362047959cc82af8021a84a52b263e7e01485391"
 dependencies = [
  "anyhow",
  "bincode",
@@ -736,7 +735,7 @@ dependencies = [
 [[package]]
 name = "sp1-zkvm"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/sp1.git#c454f8950bef85c5619e405ed1909d1ceae59028"
+source = "git+https://github.com/succinctlabs/sp1.git#362047959cc82af8021a84a52b263e7e01485391"
 dependencies = [
  "bincode",
  "cfg-if",
@@ -839,17 +838,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tendermint-example-program"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_cbor",
- "serde_json",
- "sp1-zkvm",
- "tendermint-light-client-verifier",
-]
-
-[[package]]
 name = "tendermint-light-client-verifier"
 version = "0.35.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -860,6 +848,17 @@ dependencies = [
  "serde",
  "tendermint",
  "time",
+]
+
+[[package]]
+name = "tendermint-program"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_cbor",
+ "serde_json",
+ "sp1-zkvm",
+ "tendermint-light-client-verifier",
 ]
 
 [[package]]
@@ -882,9 +881,9 @@ dependencies = [
 
 [[package]]
 name = "time"
-version = "0.3.34"
+version = "0.3.36"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c8248b6521bb14bc45b4067159b9b6ad792e2d6d754d6c41fb50e29fefe38749"
+checksum = "5dfd88e563464686c916c7e46e623e520ddc6d79fa6641390f2e3fa86e83e885"
 dependencies = [
  "deranged",
  "num-conv",
@@ -901,9 +900,9 @@ checksum = "ef927ca75afb808a4d64dd374f00a2adf8d0fcff8e7b184af886c3c87ec4a3f3"
 
 [[package]]
 name = "time-macros"
-version = "0.2.17"
+version = "0.2.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7ba3a3ef41e6672a2f0f001392bb5dcd3ff0a9992d618ca761a11c3121547774"
+checksum = "3f252a68540fde3a3877aeea552b832b40ab9a69e318efd078774a01ddee1ccf"
 dependencies = [
  "num-conv",
  "time-core",
@@ -966,8 +965,3 @@ dependencies = [
 name = "sha2"
 version = "0.10.6"
 source = "git+https://github.com/sp1-patches/RustCrypto-hashes?branch=patch-v0.10.6#482efd7c1a750c300f3740a2c75dda9eb4eb1ddd"
-
-[[patch.unused]]
-name = "sha2"
-version = "0.9.8"
-source = "git+https://github.com/sp1-patches/RustCrypto-hashes?branch=patch-v0.9.8#0b578688db61bb53e15353f5beaa2c11ad93f037"
