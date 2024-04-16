@@ -4,10 +4,9 @@ pragma solidity ^0.8.13;
 import {INetworkVerifier} from "./INetworkVerifier.sol";
 
 contract SP1Tendermint {
-    INetworkVerifier verifier;
-    bytes32 tendermintProgramHash;
-
-    bytes32 latestHeader;
+    INetworkVerifier public verifier;
+    bytes32 public tendermintProgramHash;
+    bytes32 public latestHeader;
 
     constructor(
         bytes32 _tendermintProgramHash,
@@ -37,9 +36,10 @@ contract SP1Tendermint {
             revert("Trusted block hash and public values do not match");
         }
 
-        /// @dev For now, the Tendermint program hash and proof are not used.
+        /// @dev In the dummy verifier, the program hash and proof are not used.
         verifier.verify(tendermintProgramHash, _publicValues, _proof);
 
+        /// Once the proof is verified, the next 32 bytes are the new trusted block hash.
         bytes memory proofNewHeader = _publicValues[32:64];
         latestHeader = bytes32(proofNewHeader);
     }

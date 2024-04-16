@@ -20,9 +20,11 @@ serde_cbor = "0.11.2"
 sha2 = "0.10.8"
 dotenv = "0.15.0"
 subtle-encoding = "0.5.1"
-alloy = { git = "https://github.com/alloy-rs/alloy", rev = "bfd0fda", features = [
+alloy = { git = "https://github.com/alloy-rs/alloy", features = [
     "contract",
     "signer-wallet",
+    "rpc",
+    "providers",
 ] }
 [build-dependencies]
 sp1-helper = { git = "https://github.com/succinctlabs/sp1.git" }

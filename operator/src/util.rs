@@ -5,11 +5,23 @@ use std::error::Error;
 use reqwest::Client;
 use serde::Deserialize;
 use tendermint::{
-    block::signed_header::SignedHeader,
+    block::{self, signed_header::SignedHeader},
     node::Id,
     validator::{Info, Set},
+    Block,
 };
 use tendermint_light_client_verifier::types::{LightBlock, ValidatorSet};
+
+#[derive(Debug, Deserialize)]
+pub struct BlockResponse {
+    pub result: BlockWrapper,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct BlockWrapper {
+    pub block_id: Option<block::Id>,
+    pub block: Block,
+}
 
 #[derive(Debug, Deserialize)]
 pub struct CommitResponse {
@@ -55,6 +67,16 @@ pub fn sort_signatures_by_validators_power_desc(
             .unwrap_or(&0);
         power_b.cmp(power_a)
     });
+}
+
+pub async fn fetch_block(client: &Client, url: &str) -> Result<BlockResponse, Box<dyn Error>> {
+    let response: BlockResponse = client
+        .get(url)
+        .send()
+        .await?
+        .json::<BlockResponse>()
+        .await?;
+    Ok(response)
 }
 
 pub async fn fetch_latest_commit(

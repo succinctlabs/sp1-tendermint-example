@@ -49,7 +49,8 @@ fn main() {
     let vp = ProdVerifier::default();
     let opt = Options {
         trust_threshold: Default::default(),
-        trusting_period: Duration::from_secs(500),
+        // 2 week trusting period.
+        trusting_period: Duration::from_secs(14 * 24 * 60 * 60),
         clock_drift: Default::default(),
     };
     let verify_time = light_block_2.time() + Duration::from_secs(20);
