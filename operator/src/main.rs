@@ -13,7 +13,6 @@ use ethers::types::TransactionReceipt;
 // use alloy::providers::ProviderBuilder;
 // use alloy::signers::wallet::LocalWallet;
 use reqwest::Client;
-use reqwest::Url;
 use sp1_sdk::{utils, ProverClient, PublicValues, SP1Stdin};
 
 use ethers::providers::{Http, Provider};
@@ -30,8 +29,6 @@ use tendermint_light_client_verifier::Verifier;
 use crate::util::fetch_block;
 use crate::util::fetch_latest_commit;
 use crate::util::fetch_light_block;
-
-use alloy::sol;
 
 // sol! {
 //     #[sol(rpc)]
@@ -117,16 +114,14 @@ async fn prove_next_block_height_update(
 
     let mut stdin = SP1Stdin::new();
 
+    // TODO: normally we could just write the LightBlock, but bincode doesn't work with LightBlock.
+    // let encoded: Vec<u8> = bincode::serialize(&light_block_1).unwrap();
+    // let decoded: LightBlock = bincode::deserialize(&encoded[..]).unwrap();
     let encoded_1 = serde_cbor::to_vec(&trusted_light_block).unwrap();
     let encoded_2 = serde_cbor::to_vec(&target_light_block).unwrap();
 
     stdin.write_vec(encoded_1);
     stdin.write_vec(encoded_2);
-
-    // TODO: normally we could just write the LightBlock, but bincode doesn't work with LightBlock.
-    // The following code will panic.
-    // let encoded: Vec<u8> = bincode::serialize(&light_block_1).unwrap();
-    // let decoded: LightBlock = bincode::deserialize(&encoded[..]).unwrap();
 
     // Read SP1_PRIVATE_KEY from environment variable.
     let sp1_private_key = env::var("SP1_PRIVATE_KEY").unwrap();
@@ -139,9 +134,9 @@ async fn prove_next_block_height_update(
 
     // Verify proof.
     // To-do: Re-enable verifying when remote proving is stable.
-    // client
-    //     .verify(TENDERMINT_ELF, &proof)
-    //     .expect("verification failed");
+    client
+        .verify(TENDERMINT_ELF, &proof)
+        .expect("verification failed");
 
     // Verify the public values
     let mut pv_hasher = Sha256::new();
@@ -169,7 +164,7 @@ async fn main() {
     utils::setup_logger();
 
     // BLOCK_INTERVAL defines which block to update to next.
-    let block_interval: u64 = 1000;
+    let block_interval: u64 = 10;
 
     // Read private key from environment variable.
     let private_key = env::var("PRIVATE_KEY").unwrap();
@@ -178,11 +173,6 @@ async fn main() {
     let rpc_url = env::var("RPC_URL").unwrap();
 
     loop {
-        // let provider = ProviderBuilder::new()
-        //     .signer(EthereumSigner::from(signer))
-        //     .on_http(Url::parse(&rpc_url).unwrap())
-        //     .expect("could not connect to client");
-
         let provider =
             Provider::<Http>::try_from(rpc_url.clone()).expect("could not connect to client");
 
@@ -239,8 +229,6 @@ async fn main() {
             } else {
                 println!("Transaction failed");
             }
-            // // let _ = update_call.call().await.unwrap();
-            // update_call.send().await.unwrap();
 
             println!(
                 "successfully generated and verified proof for the program! relayed to contract"
