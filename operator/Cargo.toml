@@ -27,5 +27,6 @@ alloy = { git = "https://github.com/alloy-rs/alloy", features = [
     "providers",
     "reqwest",
 ] }
+ethers = "2.0.14"
 [build-dependencies]
 sp1-helper = { git = "https://github.com/succinctlabs/sp1.git" }
