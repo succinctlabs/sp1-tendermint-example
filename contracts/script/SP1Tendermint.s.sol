@@ -12,7 +12,8 @@ contract SP1TendermintScript is Script {
         vm.startBroadcast();
 
         // Deploy dummy verifier.
-        DummyVerifier dummyVerifier = new DummyVerifier();
+        address dummyVerifierAddress = 0x7e9EA781E71837b07C7Fb6d4efed938C48a28f51;
+        DummyVerifier dummyVerifier = DummyVerifier(dummyVerifierAddress);
 
         bytes32 trustedBlockHash = bytes32(
             0x41410655235f653628714eecd34b317e60b26ee3eae9127a13c2dd88f0e2a291
