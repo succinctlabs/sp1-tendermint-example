@@ -74,6 +74,7 @@ dependencies = [
  "alloy-genesis 0.1.0 (git+https://github.com/alloy-rs/alloy)",
  "alloy-provider 0.1.0 (git+https://github.com/alloy-rs/alloy)",
  "alloy-rpc-client 0.1.0 (git+https://github.com/alloy-rs/alloy)",
+ "alloy-rpc-types 0.1.0 (git+https://github.com/alloy-rs/alloy)",
  "alloy-serde 0.1.0 (git+https://github.com/alloy-rs/alloy)",
  "alloy-signer 0.1.0 (git+https://github.com/alloy-rs/alloy)",
  "alloy-signer-wallet 0.1.0 (git+https://github.com/alloy-rs/alloy)",

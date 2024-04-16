@@ -2,13 +2,18 @@ use std::env;
 use std::str::FromStr;
 use std::time::Duration;
 
-use alloy::primitives::Address;
+use alloy::primitives::{Address, Bytes};
+use alloy::providers::network::Ethereum;
 use alloy::providers::network::EthereumSigner;
+use alloy::providers::Provider;
 use alloy::providers::ProviderBuilder;
+use alloy::rpc::types::eth::TransactionRequest;
 use alloy::signers::wallet::LocalWallet;
 use alloy::signers::Signer;
+use alloy::sol_types::SolCall;
 use reqwest::Client;
 use reqwest::Url;
+use sp1_sdk::utils::BabyBearPoseidon2;
 use sp1_sdk::{utils, ProverClient, PublicValues, SP1Stdin};
 
 use sha2::{Digest, Sha256};
@@ -152,6 +157,19 @@ async fn prove_next_block_height_update(
     (proof.public_values.buffer.data, vec![])
 }
 
+async fn get_existing_proof(proof_id: &str) -> (Vec<u8>, Vec<u8>) {
+    let sp1_private_key = env::var("SP1_PRIVATE_KEY").unwrap();
+    let client = ProverClient::new().with_network(sp1_private_key.as_str());
+
+    let (_, proof_response) = client
+        .client
+        .unwrap()
+        .get_proof_status::<BabyBearPoseidon2>(proof_id)
+        .await
+        .unwrap();
+    (proof_response.unwrap().public_values.buffer.data, vec![])
+}
+
 #[tokio::main]
 async fn main() {
     dotenv::dotenv().ok();
@@ -170,13 +188,16 @@ async fn main() {
     loop {
         let signer = LocalWallet::from_str(&private_key).unwrap();
         let provider = ProviderBuilder::new()
-            .signer(EthereumSigner::from(signer))
+            .signer(EthereumSigner::from(signer.clone()))
             .on_http(Url::parse(&rpc_url).unwrap())
-            .expect("could not connect to client");
+            .unwrap();
+
+        // let base_fee = provider.get_gas_price().await.unwrap();
+        // println!("Base fee: {:?}", base_fee);
 
         let address: Address = Address::from_str(&env::var("CONTRACT_ADDRESS").unwrap()).unwrap();
 
-        let contract = SP1Tendermint::new(address, provider);
+        let contract = SP1Tendermint::new(address, provider.clone());
 
         let latest_header_hash_call = contract.latestHeader();
 
@@ -202,14 +223,43 @@ async fn main() {
             let (trusted_light_block, target_light_block) =
                 get_light_blocks(&trusted_header_hash._0.0, next_block_height).await;
 
-            // Discard the proof bytes for now and update the
-            let (pv, proof) =
-                prove_next_block_height_update(&trusted_light_block, &target_light_block).await;
+            let proof_id = "proofrequest_01hvj9cbn2eabrarchtc9jadbs";
 
-            // Relay the proof to the contract.
-            let update_call = contract.update(pv.into(), proof.into());
-            let _ = update_call.call().await.unwrap();
-            let _ = update_call.send().await.unwrap();
+            let (pv, proof) = get_existing_proof(proof_id).await;
+
+            let input = SP1Tendermint::updateCall {
+                _publicValues: pv.into(),
+                _proof: proof.into(),
+            }
+            .abi_encode();
+            let input = Bytes::from(input);
+
+            let tx = TransactionRequest {
+                from: Some(signer.address()),
+                to: Some(address),
+                input: input.into(),
+                ..Default::default()
+            };
+
+            // // Discard the proof bytes for now and update the
+            // let (pv, proof) =
+            //     prove_next_block_height_update(&trusted_light_block, &target_light_block).await;
+
+            // // Relay the proof to the contract.
+            // let update_call = contract.update(pv.into(), proof.into());
+            // // let _ = update_call.call().await.unwrap();
+            // let pending_tx = update_call.send().await.unwrap();
+
+            // Send the transaction and wait for the receipt.
+            let receipt = provider
+                .send_transaction(tx)
+                .await
+                .expect("Failed to send transaction")
+                .get_receipt()
+                .await
+                .unwrap();
+
+            println!("Send transaction: {:?}", receipt.transaction_hash);
 
             println!(
                 "successfully generated and verified proof for the program! relayed to contract"
