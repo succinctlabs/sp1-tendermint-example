@@ -98,7 +98,8 @@ impl TendermintRPCClient {
         });
     }
 
-    pub async fn fetch_peer_id(&self, client: &Client) -> Result<[u8; 20], Box<dyn Error>> {
+    pub async fn fetch_peer_id(&self) -> Result<[u8; 20], Box<dyn Error>> {
+        let client = Client::new();
         let fetch_peer_id_url = format!("{}/status", self.url);
 
         let response: PeerIdResponse = client
@@ -114,11 +115,8 @@ impl TendermintRPCClient {
             .unwrap())
     }
 
-    pub async fn fetch_block_by_hash(
-        &self,
-        client: &Client,
-        hash: &[u8],
-    ) -> Result<BlockResponse, Box<dyn Error>> {
+    pub async fn fetch_block_by_hash(&self, hash: &[u8]) -> Result<BlockResponse, Box<dyn Error>> {
+        let client = Client::new();
         let block_by_hash_url = format!(
             "{}/block_by_hash?hash=0x{}",
             self.url,
@@ -138,14 +136,9 @@ impl TendermintRPCClient {
         trusted_header_hash: &[u8],
         target_block_height: u64,
     ) -> (LightBlock, LightBlock) {
-        let client = Client::new();
+        let peer_id = self.fetch_peer_id().await.unwrap();
 
-        let peer_id = self.fetch_peer_id(&client).await.unwrap();
-
-        let trusted_block = self
-            .fetch_block_by_hash(&client, trusted_header_hash)
-            .await
-            .unwrap();
+        let trusted_block = self.fetch_block_by_hash(trusted_header_hash).await.unwrap();
         let trusted_height = trusted_block.result.block.header.height.value();
 
         let trusted_light_block = self
@@ -160,9 +153,8 @@ impl TendermintRPCClient {
     }
 
     pub async fn get_light_block_by_hash(&self, hash: &[u8]) -> LightBlock {
-        let client = Client::new();
-        let block = self.fetch_block_by_hash(&client, hash).await.unwrap();
-        let peer_id = self.fetch_peer_id(&client).await.unwrap();
+        let block = self.fetch_block_by_hash(hash).await.unwrap();
+        let peer_id = self.fetch_peer_id().await.unwrap();
         self.fetch_light_block(
             block.result.block.header.height.value(),
             hex::decode(peer_id).unwrap().try_into().unwrap(),
@@ -173,16 +165,13 @@ impl TendermintRPCClient {
     }
 
     pub async fn get_latest_block_height(&self) -> u64 {
-        let client = Client::new();
-        let latest_commit = self.fetch_latest_commit(&client, &self.url).await.unwrap();
+        let latest_commit = self.fetch_latest_commit(&self.url).await.unwrap();
         latest_commit.result.signed_header.header.height.value()
     }
 
-    pub async fn fetch_latest_commit(
-        &self,
-        client: &Client,
-        url: &str,
-    ) -> Result<CommitResponse, Box<dyn Error>> {
+    pub async fn fetch_latest_commit(&self, url: &str) -> Result<CommitResponse, Box<dyn Error>> {
+        let client = Client::new();
+
         let response: CommitResponse = client
             .get(url)
             .send()
@@ -194,10 +183,11 @@ impl TendermintRPCClient {
 
     pub async fn fetch_commit(
         &self,
-        client: &Client,
         url: &str,
         block_height: u64,
     ) -> Result<CommitResponse, Box<dyn Error>> {
+        let client = Client::new();
+
         let response: CommitResponse = client
             .get(url)
             .query(&[
@@ -213,10 +203,10 @@ impl TendermintRPCClient {
 
     pub async fn fetch_validators(
         &self,
-        client: &Client,
         url: &str,
         block_height: u64,
     ) -> Result<Vec<Info>, Box<dyn Error>> {
+        let client = Client::new();
         let mut validators = vec![];
         let mut collected_validators = 0;
         let mut page_index = 1;
@@ -251,25 +241,19 @@ impl TendermintRPCClient {
         peer_id: [u8; 20],
         base_url: &str,
     ) -> Result<LightBlock, Box<dyn Error>> {
-        let client = Client::new();
-
         let commit_response = self
-            .fetch_commit(&client, &format!("{}/commit", base_url), block_height)
+            .fetch_commit(&format!("{}/commit", base_url), block_height)
             .await?;
         let mut signed_header = commit_response.result.signed_header;
 
         let validator_response = self
-            .fetch_validators(&client, &format!("{}/validators", base_url), block_height)
+            .fetch_validators(&format!("{}/validators", base_url), block_height)
             .await?;
 
         let validators = Set::new(validator_response, None);
 
         let next_validator_response = self
-            .fetch_validators(
-                &client,
-                &format!("{}/validators", base_url),
-                block_height + 1,
-            )
+            .fetch_validators(&format!("{}/validators", base_url), block_height + 1)
             .await?;
         let next_validators = Set::new(next_validator_response, None);
 

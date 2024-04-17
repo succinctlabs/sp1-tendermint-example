@@ -76,21 +76,20 @@ async fn main() -> anyhow::Result<()> {
     let contract_address: Address =
         Address::from_str(&contract_address).expect("CONTRACT_ADDRESS not valid");
 
+    // Initialize client for interacting with Tendermint.
+    let tendermint_client = TendermintRPCClient::default();
+
     loop {
+        // Initialize on-chain clients.
         let provider =
             Provider::<Http>::try_from(rpc_url.clone()).expect("could not connect to client");
-
         let signer = LocalWallet::from_str(&private_key)
             .unwrap()
             .with_chain_id(provider.get_chainid().await.unwrap().as_u64());
-
-        let tendermint_client = TendermintRPCClient::default();
         let client = Arc::new(SignerMiddleware::new(provider.clone(), signer.clone()));
-
         let contract = SP1Tendermint::new(contract_address.0 .0, client);
 
         let trusted_header_hash = contract.latest_header().await?;
-
         println!("Trusted header hash: {:?}", trusted_header_hash);
 
         let trusted_light_block = tendermint_client
