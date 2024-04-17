@@ -9,9 +9,6 @@ use ethers::middleware::SignerMiddleware;
 use ethers::providers::Middleware;
 use ethers::signers::Signer;
 use ethers::types::TransactionReceipt;
-// use alloy::providers::network::EthereumSigner;
-// use alloy::providers::ProviderBuilder;
-// use alloy::signers::wallet::LocalWallet;
 use reqwest::Client;
 use sp1_sdk::{utils, ProverClient, PublicValues, SP1Stdin};
 
@@ -26,22 +23,9 @@ use tendermint_light_client_verifier::ProdVerifier;
 use tendermint_light_client_verifier::Verdict;
 use tendermint_light_client_verifier::Verifier;
 
-use crate::util::fetch_block;
 use crate::util::fetch_latest_commit;
 use crate::util::fetch_light_block;
-
-// sol! {
-//     #[sol(rpc)]
-//     contract SP1Tendermint {
-//         #[derive(Debug)]
-//         bytes32 public latestHeader;
-
-//         function update(
-//             bytes calldata _publicValues,
-//             bytes calldata _proof
-//         );
-//     }
-// }
+use crate::util::{fetch_block, fetch_peer_id};
 
 abigen!(SP1Tendermint, "../abi/SP1Tendermint.abi.json");
 
@@ -78,20 +62,22 @@ async fn get_light_blocks(
     trusted_header_hash: &[u8],
     target_block_height: u64,
 ) -> (LightBlock, LightBlock) {
-    // Uniquely identify a peer in the network.
-    let peer_id: [u8; 20] = [
-        0x72, 0x6b, 0xc8, 0xd2, 0x60, 0x38, 0x7c, 0xf5, 0x6e, 0xcf, 0xad, 0x3a, 0x6b, 0xf6, 0xfe,
-        0xcd, 0x90, 0x3e, 0x18, 0xa2,
-    ];
     const BASE_URL: &str = "https://celestia-mocha-rpc.publicnode.com:443";
+
+    let fetch_peer_id_url = format!("{}/status", BASE_URL);
+
+    let client = Client::new();
+
+    let peer_id_response = fetch_peer_id(&client, &fetch_peer_id_url).await.unwrap();
+    let peer_id_str = peer_id_response.result.node_info.id;
+    let peer_id = hex::decode(peer_id_str).unwrap();
+    let peer_id = peer_id.try_into().unwrap();
 
     let block_by_hash_url = format!(
         "{}/block_by_hash?hash=0x{}",
         BASE_URL,
         String::from_utf8(hex::encode(trusted_header_hash)).unwrap()
     );
-
-    let client = Client::new();
 
     let trusted_block = fetch_block(&client, &block_by_hash_url).await.unwrap();
     let trusted_height = trusted_block.result.block.header.height.value();
@@ -219,6 +205,7 @@ async fn main() {
                 prove_next_block_height_update(&trusted_light_block, &target_light_block).await;
 
             // Relay the proof to the contract.
+            // TODO: Parse errors nicely.
             let tx: Option<TransactionReceipt> = contract
                 .update(pv.into(), proof.into())
                 .send()

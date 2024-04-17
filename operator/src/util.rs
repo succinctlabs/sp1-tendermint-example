@@ -13,6 +13,21 @@ use tendermint::{
 use tendermint_light_client_verifier::types::{LightBlock, ValidatorSet};
 
 #[derive(Debug, Deserialize)]
+pub struct PeerIdResponse {
+    pub result: PeerIdWrapper,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct PeerIdWrapper {
+    pub node_info: NodeInfoWrapper,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct NodeInfoWrapper {
+    pub id: String,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct BlockResponse {
     pub result: BlockWrapper,
 }
@@ -67,6 +82,16 @@ pub fn sort_signatures_by_validators_power_desc(
             .unwrap_or(&0);
         power_b.cmp(power_a)
     });
+}
+
+pub async fn fetch_peer_id(client: &Client, url: &str) -> Result<PeerIdResponse, Box<dyn Error>> {
+    let response: PeerIdResponse = client
+        .get(url)
+        .send()
+        .await?
+        .json::<PeerIdResponse>()
+        .await?;
+    Ok(response)
 }
 
 pub async fn fetch_block(client: &Client, url: &str) -> Result<BlockResponse, Box<dyn Error>> {
