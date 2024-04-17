@@ -64,12 +64,15 @@ pub struct TendermintRPCClient {
     url: String,
 }
 
-impl TendermintRPCClient {
-    pub fn default() -> Self {
+impl Default for TendermintRPCClient {
+    fn default() -> Self {
         TendermintRPCClient {
             url: env::var("TENDERMINT_RPC_URL").expect("TENDERMINT_RPC_URL not set"),
         }
     }
+}
+
+impl TendermintRPCClient {
     pub fn new(url: String) -> Self {
         TendermintRPCClient { url }
     }
