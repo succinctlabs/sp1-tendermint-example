@@ -26,6 +26,7 @@ async fn main() -> anyhow::Result<()> {
         // Generate a header update proof to the latest block.
         let proof_data = generate_header_update_proof_to_latest_block(&trusted_header_hash).await;
 
+        // Relay the proof to the contract.
         if let Ok(proof_data) = proof_data {
             let update_header_call_data = SP1Tendermint::updateHeaderCall {
                 publicValues: proof_data.pv.into(),
@@ -33,7 +34,6 @@ async fn main() -> anyhow::Result<()> {
             }
             .abi_encode();
 
-            // Relay the proof to the contract.
             contract_client.send(update_header_call_data).await?;
         }
 
