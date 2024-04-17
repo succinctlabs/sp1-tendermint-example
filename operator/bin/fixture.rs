@@ -23,6 +23,7 @@ struct FixtureArgs {
 /// ```
 /// cargo run --bin fixture -- trusted_block=1 target_block=5
 /// ```
+/// The fixture will be written to the path: ./contracts/fixtures/fixture_1:5.json
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
