@@ -27,7 +27,8 @@ impl Default for ContractClient {
         let private_key = env::var("PRIVATE_KEY").expect("PRIVATE_KEY not set");
         let contract = env::var("CONTRACT_ADDRESS").expect("CONTRACT_ADDRESS not set");
 
-        Self::new(chain_id, &rpc_url, &private_key, &contract).expect("Failed to create TxSender")
+        Self::new(chain_id, &rpc_url, &private_key, &contract)
+            .expect("Failed to create ContractClient")
     }
 }
 

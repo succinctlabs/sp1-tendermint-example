@@ -10,15 +10,15 @@ This repository contains the
 To generate fixtures for local testing run:
 
 ```shell
-cd operator
-cargo run --bin fixture -- --trusted-block 2 --target-block 6
+$ cd operator
+$ cargo run --bin fixture -- --trusted-block 2 --target-block 6
 ```
 
 To run the example operator with a deployed Tendermint contract run:
 
 ```shell
-cd operator
-cargo run --bin operator
+$ cd operator
+$ cargo run --bin operator
 ```
 
 https://sepolia.etherscan.io/address/0xd73F7935d19d7D37E1a5c6271b9D8BA989928C16
