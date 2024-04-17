@@ -98,13 +98,11 @@ impl TendermintRPCClient {
         });
     }
 
-    pub async fn fetch_peer_id(
-        &self,
-        client: &Client,
-        url: &str,
-    ) -> Result<[u8; 20], Box<dyn Error>> {
+    pub async fn fetch_peer_id(&self, client: &Client) -> Result<[u8; 20], Box<dyn Error>> {
+        let fetch_peer_id_url = format!("{}/status", self.url);
+
         let response: PeerIdResponse = client
-            .get(url)
+            .get(fetch_peer_id_url)
             .send()
             .await?
             .json::<PeerIdResponse>()
@@ -116,13 +114,18 @@ impl TendermintRPCClient {
             .unwrap())
     }
 
-    pub async fn fetch_block(
+    pub async fn fetch_block_by_hash(
         &self,
         client: &Client,
-        url: &str,
+        hash: &[u8],
     ) -> Result<BlockResponse, Box<dyn Error>> {
+        let block_by_hash_url = format!(
+            "{}/block_by_hash?hash=0x{}",
+            self.url,
+            String::from_utf8(hex::encode(hash)).unwrap()
+        );
         let response: BlockResponse = client
-            .get(url)
+            .get(block_by_hash_url)
             .send()
             .await?
             .json::<BlockResponse>()
@@ -135,22 +138,14 @@ impl TendermintRPCClient {
         trusted_header_hash: &[u8],
         target_block_height: u64,
     ) -> (LightBlock, LightBlock) {
-        let fetch_peer_id_url = format!("{}/status", self.url);
-
         let client = Client::new();
 
-        let peer_id = self
-            .fetch_peer_id(&client, &fetch_peer_id_url)
+        let peer_id = self.fetch_peer_id(&client).await.unwrap();
+
+        let trusted_block = self
+            .fetch_block_by_hash(&client, trusted_header_hash)
             .await
             .unwrap();
-
-        let block_by_hash_url = format!(
-            "{}/block_by_hash?hash=0x{}",
-            self.url,
-            String::from_utf8(hex::encode(trusted_header_hash)).unwrap()
-        );
-
-        let trusted_block = self.fetch_block(&client, &block_by_hash_url).await.unwrap();
         let trusted_height = trusted_block.result.block.header.height.value();
 
         let trusted_light_block = self
@@ -165,14 +160,9 @@ impl TendermintRPCClient {
     }
 
     pub async fn get_light_block_by_hash(&self, hash: &[u8]) -> LightBlock {
-        let url = format!(
-            "{}/block_by_hash?hash=0x{}",
-            self.url,
-            String::from_utf8(hex::encode(hash)).unwrap()
-        );
         let client = Client::new();
-        let block = self.fetch_block(&client, &url).await.unwrap();
-        let peer_id = self.fetch_peer_id(&client, &url).await.unwrap();
+        let block = self.fetch_block_by_hash(&client, hash).await.unwrap();
+        let peer_id = self.fetch_peer_id(&client).await.unwrap();
         self.fetch_light_block(
             block.result.block.header.height.value(),
             hex::decode(peer_id).unwrap().try_into().unwrap(),
