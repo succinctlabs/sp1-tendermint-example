@@ -3,8 +3,6 @@
 Tendermint light client on Ethereum powered by SP1.
 
 ## Overview
-This repository contains the 
-
 
 ## Generate Fixtures for Forge Testing
 To generate fixtures for local testing run:
