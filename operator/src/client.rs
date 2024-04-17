@@ -11,13 +11,13 @@ use std::env;
 
 /// Wrapper of a `SignerMiddleware` client to send transactions to the given
 /// contract's `Address`.
-pub struct TxSender {
+pub struct ContractClient {
     chain_id: u64,
     client: SignerMiddleware<Provider<Http>, LocalWallet>,
     contract: Address,
 }
 
-impl Default for TxSender {
+impl Default for ContractClient {
     fn default() -> Self {
         let chain_id = env::var("CHAIN_ID")
             .expect("CHAIN_ID not set")
@@ -32,7 +32,7 @@ impl Default for TxSender {
 }
 
 // TODO: Rewrite this.
-impl TxSender {
+impl ContractClient {
     /// Creates a new `TxSender`.
     pub fn new(chain_id: u64, rpc_url: &str, private_key: &str, contract: &str) -> Result<Self> {
         let provider = Provider::<Http>::try_from(rpc_url)?;
@@ -40,7 +40,7 @@ impl TxSender {
         let client = SignerMiddleware::new(provider.clone(), wallet.clone());
         let contract = contract.parse::<Address>()?;
 
-        Ok(TxSender {
+        Ok(ContractClient {
             chain_id,
             client,
             contract,
