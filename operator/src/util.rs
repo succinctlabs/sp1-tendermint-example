@@ -4,6 +4,7 @@ use std::error::Error;
 
 use reqwest::Client;
 use serde::Deserialize;
+use subtle_encoding::hex;
 use tendermint::{
     block::{self, signed_header::SignedHeader},
     node::Id,
@@ -102,6 +103,65 @@ pub async fn fetch_block(client: &Client, url: &str) -> Result<BlockResponse, Bo
         .json::<BlockResponse>()
         .await?;
     Ok(response)
+}
+
+pub async fn get_light_blocks(
+    trusted_header_hash: &[u8],
+    target_block_height: u64,
+) -> (LightBlock, LightBlock) {
+    const BASE_URL: &str = "https://celestia-mocha-rpc.publicnode.com:443";
+
+    let fetch_peer_id_url = format!("{}/status", BASE_URL);
+
+    let client = Client::new();
+
+    let peer_id_response = fetch_peer_id(&client, &fetch_peer_id_url).await.unwrap();
+    let peer_id_str = peer_id_response.result.node_info.id;
+    let peer_id = hex::decode(peer_id_str).unwrap();
+    let peer_id = peer_id.try_into().unwrap();
+
+    let block_by_hash_url = format!(
+        "{}/block_by_hash?hash=0x{}",
+        BASE_URL,
+        String::from_utf8(hex::encode(trusted_header_hash)).unwrap()
+    );
+
+    let trusted_block = fetch_block(&client, &block_by_hash_url).await.unwrap();
+    let trusted_height = trusted_block.result.block.header.height.value();
+
+    let trusted_light_block = fetch_light_block(trusted_height, peer_id, BASE_URL)
+        .await
+        .expect("Failed to generate light block 1");
+    let target_light_block = fetch_light_block(target_block_height, peer_id, BASE_URL)
+        .await
+        .expect("Failed to generate light block 2");
+    (trusted_light_block, target_light_block)
+}
+
+pub async fn get_light_block_by_hash(hash: &[u8]) -> LightBlock {
+    let peer_id: [u8; 20] = [
+        0x72, 0x6b, 0xc8, 0xd2, 0x60, 0x38, 0x7c, 0xf5, 0x6e, 0xcf, 0xad, 0x3a, 0x6b, 0xf6, 0xfe,
+        0xcd, 0x90, 0x3e, 0x18, 0xa2,
+    ];
+    const BASE_URL: &str = "https://celestia-mocha-rpc.publicnode.com:443";
+
+    let url = format!(
+        "{}/block_by_hash?hash=0x{}",
+        BASE_URL,
+        String::from_utf8(hex::encode(hash)).unwrap()
+    );
+    let client = Client::new();
+    let block = fetch_block(&client, &url).await.unwrap();
+    fetch_light_block(block.result.block.header.height.value(), peer_id, BASE_URL)
+        .await
+        .unwrap()
+}
+
+pub async fn get_latest_block_height() -> u64 {
+    let url = "https://celestia-mocha-rpc.publicnode.com:443/commit";
+    let client = Client::new();
+    let latest_commit = fetch_latest_commit(&client, url).await.unwrap();
+    latest_commit.result.signed_header.header.height.value()
 }
 
 pub async fn fetch_latest_commit(
