@@ -21,7 +21,7 @@ contract SP1TendermintTest is Test {
     }
 
     function test_addNewBlockHash() public {
-        sp1.update(
+        sp1.updateHeader(
             hex"41410655235f653628714eecd34b317e60b26ee3eae9127a13c2dd88f0e2a2918f988d0d730aef11ae9c4f3cd9adfb3b6aac94a20948f037beeac22f8df362586753756363657373",
             bytes("")
         );
