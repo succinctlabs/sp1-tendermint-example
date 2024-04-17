@@ -8,6 +8,7 @@ pub mod util;
 
 const TENDERMINT_ELF: &[u8] = include_bytes!("../../program/elf/riscv32im-succinct-zkvm-elf");
 
+// TODO: Change this type to include the necessary data for the contract to verify the proof.
 #[derive(Serialize, Deserialize)]
 pub struct ProofData {
     pub pv: Vec<u8>,
