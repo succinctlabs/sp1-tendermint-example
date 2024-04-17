@@ -66,9 +66,6 @@ async fn generate_header_update_proof(
 async fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
 
-    // BLOCK_INTERVAL defines which block to update to next.
-    let block_interval: u64 = 10;
-
     // Read environment variables.
     let rpc_url = env::var("RPC_URL").unwrap();
     let private_key = env::var("PRIVATE_KEY").unwrap();
@@ -76,11 +73,11 @@ async fn main() -> anyhow::Result<()> {
     let contract_address: Address =
         Address::from_str(&contract_address).expect("CONTRACT_ADDRESS not valid");
 
-    // Initialize client for interacting with Tendermint.
+    // Initialize client for interacting with the Tendermint chain.
     let tendermint_client = TendermintRPCClient::default();
 
     loop {
-        // Initialize on-chain clients.
+        // Initialize the client for interacting with the SP1Tendermint contract.
         let provider =
             Provider::<Http>::try_from(rpc_url.clone()).expect("could not connect to client");
         let signer = LocalWallet::from_str(&private_key)
@@ -89,56 +86,41 @@ async fn main() -> anyhow::Result<()> {
         let client = Arc::new(SignerMiddleware::new(provider.clone(), signer.clone()));
         let contract = SP1Tendermint::new(contract_address.0 .0, client);
 
+        // Read the existing trusted header hash from the contract.
         let trusted_header_hash = contract.latest_header().await?;
         println!("Trusted header hash: {:?}", trusted_header_hash);
 
-        let trusted_light_block = tendermint_client
-            .get_light_block_by_hash(&trusted_header_hash)
+        // Get the block height corresponding to the trusted header hash.
+        let trusted_block_height = tendermint_client
+            .get_block_height_from_hash(&trusted_header_hash)
             .await;
-        let trusted_block_height = trusted_light_block.signed_header.header.height.value();
-        println!(
-            "Trusted light block height: {}",
-            trusted_light_block.signed_header.header.height.value()
-        );
+        println!("Trusted light block height: {}", trusted_block_height);
 
-        // Find next block.
-        let next_block_height =
-            trusted_block_height + block_interval - (trusted_block_height % block_interval);
-
-        // Get latest block.
+        // Get the latest block from the Tendermint chain.
         let latest_block_height = tendermint_client.get_latest_block_height().await;
 
-        if next_block_height < latest_block_height {
-            let trusted_block = tendermint_client
-                .fetch_block_by_hash(&trusted_header_hash)
-                .await
-                .unwrap();
-            let trusted_height = trusted_block.result.block.header.height.value();
+        // Generate a proof of the update from trusted_block_height to latest_block_height and get the corresponding
+        // proof data.
+        let (trusted_light_block, target_light_block) = tendermint_client
+            .get_light_blocks(trusted_block_height, latest_block_height)
+            .await;
+        let proof_data =
+            generate_header_update_proof(&trusted_light_block, &target_light_block).await;
 
-            let (trusted_light_block, target_light_block) = tendermint_client
-                .get_light_blocks(trusted_height, next_block_height)
-                .await;
+        // Relay the proof to the contract.
+        let tx: Option<TransactionReceipt> = contract
+            .update(proof_data.pv.into(), proof_data.proof.into())
+            .send()
+            .await?
+            .await?;
 
-            // Generate a proof of the update from trusted_light_block to target_light_block and get the corresponding
-            // proof data.
-            let proof_data =
-                generate_header_update_proof(&trusted_light_block, &target_light_block).await;
-
-            // Relay the proof to the contract.
-            // TODO: Parse errors nicely.
-            let tx: Option<TransactionReceipt> = contract
-                .update(proof_data.pv.into(), proof_data.proof.into())
-                .send()
-                .await?
-                .await?;
-
-            if let Some(tx) = tx {
-                println!(
-                    "Successfully relayed proof! Transaction hash: {:?}",
-                    tx.transaction_hash
-                );
-            }
+        if let Some(tx) = tx {
+            println!(
+                "Successfully relayed proof! Transaction hash: {:?}",
+                tx.transaction_hash
+            );
         }
+
         // Sleep for 10 seconds.
         println!("sleeping for 10 seconds");
         tokio::time::sleep(Duration::from_secs(10)).await;

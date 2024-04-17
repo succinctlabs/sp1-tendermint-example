@@ -115,6 +115,11 @@ impl TendermintRPCClient {
             .unwrap())
     }
 
+    pub async fn get_block_height_from_hash(&self, hash: &[u8]) -> u64 {
+        let block = self.fetch_block_by_hash(hash).await.unwrap();
+        block.result.block.header.height.value()
+    }
+
     pub async fn fetch_block_by_hash(&self, hash: &[u8]) -> Result<BlockResponse, Box<dyn Error>> {
         let client = Client::new();
         let block_by_hash_url = format!(
