@@ -5589,6 +5589,7 @@ name = "tendermint-operator"
 version = "0.1.0"
 dependencies = [
  "alloy 0.1.0 (git+https://github.com/alloy-rs/alloy)",
+ "anyhow",
  "bincode",
  "dotenv",
  "ethers",

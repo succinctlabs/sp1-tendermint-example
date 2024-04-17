@@ -1,24 +1,15 @@
-use std::env;
-use std::str::FromStr;
-use std::sync::Arc;
-use std::time::Duration;
-
+use crate::util::{get_latest_block_height, get_light_block_by_hash, get_light_blocks};
 use alloy::primitives::Address;
-use ethers::contract::abigen;
-use ethers::middleware::SignerMiddleware;
-use ethers::providers::Middleware;
-use ethers::signers::Signer;
-use ethers::types::TransactionReceipt;
-use sp1_sdk::{utils, ProverClient, SP1Stdin};
-
-use ethers::providers::{Http, Provider};
-use ethers::signers::LocalWallet;
-
+use ethers::{
+    contract::abigen,
+    middleware::SignerMiddleware,
+    providers::{Http, Middleware, Provider},
+    signers::{LocalWallet, Signer},
+    types::TransactionReceipt,
+};
+use sp1_sdk::{ProverClient, SP1Stdin};
+use std::{env, str::FromStr, sync::Arc, time::Duration};
 use tendermint_light_client_verifier::types::LightBlock;
-
-use crate::util::get_latest_block_height;
-use crate::util::get_light_block_by_hash;
-use crate::util::get_light_blocks;
 
 abigen!(SP1Tendermint, "../abi/SP1Tendermint.abi.json");
 
@@ -30,8 +21,9 @@ struct ProofData {
     proof: Vec<u8>,
 }
 
-// Return the public values and proof.
-async fn prove_next_block_height_update(
+// Generate a proof of an update from trusted_light_block to target_light_block. Returns the public values and proof
+// of the update.
+async fn generate_header_update_proof(
     trusted_light_block: &LightBlock,
     target_light_block: &LightBlock,
 ) -> ProofData {
@@ -46,10 +38,10 @@ async fn prove_next_block_height_update(
     stdin.write_vec(encoded_1);
     stdin.write_vec(encoded_2);
 
-    // Read SP1_PRIVATE_KEY from environment variable.
-    let sp1_private_key = env::var("SP1_PRIVATE_KEY").unwrap();
-    let client = ProverClient::new().with_network(sp1_private_key.as_str());
+    // Note: Uses PRIVATE_KEY by default.
+    let client = ProverClient::new();
 
+    // Submit the proof request to the prover network and poll for the proof.
     let proof = client
         .prove_remote_async(TENDERMINT_ELF, stdin)
         .await
@@ -71,19 +63,18 @@ async fn prove_next_block_height_update(
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
-    // Generate proof.
-    utils::setup_logger();
 
     // BLOCK_INTERVAL defines which block to update to next.
     let block_interval: u64 = 10;
 
-    // Read private key from environment variable.
-    let private_key = env::var("PRIVATE_KEY").unwrap();
-
-    // Read RPC URL from environment variable.
+    // Read environment variables.
     let rpc_url = env::var("RPC_URL").unwrap();
+    let private_key = env::var("PRIVATE_KEY").unwrap();
+    let contract_address = env::var("CONTRACT_ADDRESS").expect("CONTRACT_ADDRESS not set");
+    let contract_address: Address =
+        Address::from_str(&contract_address).expect("CONTRACT_ADDRESS not valid");
 
     loop {
         let provider =
@@ -95,11 +86,9 @@ async fn main() {
 
         let client = Arc::new(SignerMiddleware::new(provider.clone(), signer.clone()));
 
-        let address: Address = Address::from_str(&env::var("CONTRACT_ADDRESS").unwrap()).unwrap();
+        let contract = SP1Tendermint::new(contract_address.0 .0, client);
 
-        let contract = SP1Tendermint::new(address.0 .0, client);
-
-        let trusted_header_hash = contract.latest_header().await.unwrap();
+        let trusted_header_hash = contract.latest_header().await?;
 
         println!("Trusted header hash: {:?}", trusted_header_hash);
 
@@ -121,19 +110,18 @@ async fn main() {
             let (trusted_light_block, target_light_block) =
                 get_light_blocks(&trusted_header_hash, next_block_height).await;
 
-            // Discard the proof bytes for now and update the
+            // Generate a proof of the update from trusted_light_block to target_light_block and get the corresponding
+            // proof data.
             let proof_data =
-                prove_next_block_height_update(&trusted_light_block, &target_light_block).await;
+                generate_header_update_proof(&trusted_light_block, &target_light_block).await;
 
             // Relay the proof to the contract.
             // TODO: Parse errors nicely.
             let tx: Option<TransactionReceipt> = contract
                 .update(proof_data.pv.into(), proof_data.proof.into())
                 .send()
-                .await
-                .unwrap()
-                .await
-                .unwrap();
+                .await?
+                .await?;
             if tx.is_some() {
                 println!("Transaction hash: {:?}", tx.unwrap().transaction_hash);
             } else {

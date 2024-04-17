@@ -22,5 +22,6 @@ sha2 = "0.10.8"
 dotenv = "0.15.0"
 subtle-encoding = "0.5.1"
 ethers = "2.0.14"
+anyhow = "1.0.82"
 [build-dependencies]
 sp1-helper = { git = "https://github.com/succinctlabs/sp1.git", rev = "7a57682bfd3afb33c6e1320d5723a851d42dd298" }
