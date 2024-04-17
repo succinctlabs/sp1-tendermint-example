@@ -27,7 +27,8 @@ async fn generate_header_update_proof(
     trusted_light_block: &LightBlock,
     target_light_block: &LightBlock,
 ) -> ProofData {
-    let mut stdin = SP1Stdin::new();
+    // Note: Uses PRIVATE_KEY by default to initialize the client.
+    let client = ProverClient::new();
 
     // TODO: normally we could just write the LightBlock, but bincode doesn't work with LightBlock.
     // let encoded: Vec<u8> = bincode::serialize(&light_block_1).unwrap();
@@ -35,11 +36,9 @@ async fn generate_header_update_proof(
     let encoded_1 = serde_cbor::to_vec(&trusted_light_block).unwrap();
     let encoded_2 = serde_cbor::to_vec(&target_light_block).unwrap();
 
+    let mut stdin = SP1Stdin::new();
     stdin.write_vec(encoded_1);
     stdin.write_vec(encoded_2);
-
-    // Note: Uses PRIVATE_KEY by default to initialize the client.
-    let client = ProverClient::new();
 
     // Submit the proof request to the prover network and poll for the proof.
     let proof = client
