@@ -1,4 +1,4 @@
-use crate::util::{get_latest_block_height, get_light_block_by_hash, get_light_blocks};
+use crate::util::TendermintRPCClient;
 use alloy::primitives::Address;
 use ethers::{
     contract::abigen,
@@ -84,6 +84,7 @@ async fn main() -> anyhow::Result<()> {
             .unwrap()
             .with_chain_id(provider.get_chainid().await.unwrap().as_u64());
 
+        let tendermint_client = TendermintRPCClient::default();
         let client = Arc::new(SignerMiddleware::new(provider.clone(), signer.clone()));
 
         let contract = SP1Tendermint::new(contract_address.0 .0, client);
@@ -92,7 +93,9 @@ async fn main() -> anyhow::Result<()> {
 
         println!("Trusted header hash: {:?}", trusted_header_hash);
 
-        let trusted_light_block = get_light_block_by_hash(&trusted_header_hash).await;
+        let trusted_light_block = tendermint_client
+            .get_light_block_by_hash(&trusted_header_hash)
+            .await;
         let trusted_block_height = trusted_light_block.signed_header.header.height.value();
         println!(
             "Trusted light block height: {}",
@@ -104,11 +107,12 @@ async fn main() -> anyhow::Result<()> {
             trusted_block_height + block_interval - (trusted_block_height % block_interval);
 
         // Get latest block.
-        let latest_block_height = get_latest_block_height().await;
+        let latest_block_height = tendermint_client.get_latest_block_height().await;
 
         if next_block_height < latest_block_height {
-            let (trusted_light_block, target_light_block) =
-                get_light_blocks(&trusted_header_hash, next_block_height).await;
+            let (trusted_light_block, target_light_block) = tendermint_client
+                .get_light_blocks(&trusted_header_hash, next_block_height)
+                .await;
 
             // Generate a proof of the update from trusted_light_block to target_light_block and get the corresponding
             // proof data.
