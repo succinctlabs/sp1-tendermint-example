@@ -87,13 +87,15 @@ async fn main() -> anyhow::Result<()> {
 
         // Read the existing trusted header hash from the contract.
         let trusted_header_hash = contract.latest_header().await?;
-        println!("Trusted header hash: {:?}", trusted_header_hash);
 
         // Get the block height corresponding to the trusted header hash.
         let trusted_block_height = tendermint_client
             .get_block_height_from_hash(&trusted_header_hash)
             .await;
-        println!("Trusted light block height: {}", trusted_block_height);
+        println!(
+            "SP1Tendermint contract's latest block height: {}",
+            trusted_block_height
+        );
 
         // Get the latest block from the Tendermint chain.
         let latest_block_height = tendermint_client.get_latest_block_height().await;
@@ -115,7 +117,8 @@ async fn main() -> anyhow::Result<()> {
 
         if let Some(tx) = tx {
             println!(
-                "Successfully relayed proof! Transaction hash: {:?}",
+                "Successfully relayed proof to update the SP1Tendermint contract to height {}! Transaction hash: {:?}",
+                latest_block_height,
                 tx.transaction_hash
             );
         }

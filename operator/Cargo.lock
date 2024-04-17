@@ -5213,7 +5213,7 @@ dependencies = [
 [[package]]
 name = "sp1-core"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/sp1.git?rev=7a57682bfd3afb33c6e1320d5723a851d42dd298#7a57682bfd3afb33c6e1320d5723a851d42dd298"
+source = "git+https://github.com/succinctlabs/sp1.git?rev=277f1b4cfee5129bd40d74748f3d241cdfa56e63#277f1b4cfee5129bd40d74748f3d241cdfa56e63"
 dependencies = [
  "anyhow",
  "arrayref",
@@ -5279,7 +5279,7 @@ dependencies = [
 [[package]]
 name = "sp1-derive"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/sp1.git?rev=7a57682bfd3afb33c6e1320d5723a851d42dd298#7a57682bfd3afb33c6e1320d5723a851d42dd298"
+source = "git+https://github.com/succinctlabs/sp1.git?rev=277f1b4cfee5129bd40d74748f3d241cdfa56e63#277f1b4cfee5129bd40d74748f3d241cdfa56e63"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -5289,7 +5289,7 @@ dependencies = [
 [[package]]
 name = "sp1-helper"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/sp1.git?rev=7a57682bfd3afb33c6e1320d5723a851d42dd298#7a57682bfd3afb33c6e1320d5723a851d42dd298"
+source = "git+https://github.com/succinctlabs/sp1.git?rev=277f1b4cfee5129bd40d74748f3d241cdfa56e63#277f1b4cfee5129bd40d74748f3d241cdfa56e63"
 dependencies = [
  "cargo_metadata",
  "chrono",
@@ -5298,7 +5298,7 @@ dependencies = [
 [[package]]
 name = "sp1-primitives"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/sp1.git?rev=7a57682bfd3afb33c6e1320d5723a851d42dd298#7a57682bfd3afb33c6e1320d5723a851d42dd298"
+source = "git+https://github.com/succinctlabs/sp1.git?rev=277f1b4cfee5129bd40d74748f3d241cdfa56e63#277f1b4cfee5129bd40d74748f3d241cdfa56e63"
 dependencies = [
  "itertools 0.12.1",
  "lazy_static",
@@ -5311,7 +5311,7 @@ dependencies = [
 [[package]]
 name = "sp1-sdk"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/sp1.git?rev=7a57682bfd3afb33c6e1320d5723a851d42dd298#7a57682bfd3afb33c6e1320d5723a851d42dd298"
+source = "git+https://github.com/succinctlabs/sp1.git?rev=277f1b4cfee5129bd40d74748f3d241cdfa56e63#277f1b4cfee5129bd40d74748f3d241cdfa56e63"
 dependencies = [
  "alloy 0.1.0 (git+https://github.com/alloy-rs/alloy?rev=bfd0fda)",
  "anyhow",

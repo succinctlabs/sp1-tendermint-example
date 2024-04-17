@@ -167,7 +167,8 @@ impl TendermintRPCClient {
     }
 
     pub async fn get_latest_block_height(&self) -> u64 {
-        let latest_commit = self.fetch_latest_commit(&self.url).await.unwrap();
+        let commit_url = format!("{}/commit", self.url);
+        let latest_commit = self.fetch_latest_commit(&commit_url).await.unwrap();
         latest_commit.result.signed_header.header.height.value()
     }
 

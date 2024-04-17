@@ -6,7 +6,7 @@ edition = "2021"
 
 [dependencies]
 alloy = { git = "https://github.com/alloy-rs/alloy" }
-sp1-sdk = { git = "https://github.com/succinctlabs/sp1.git", rev = "7a57682bfd3afb33c6e1320d5723a851d42dd298" }
+sp1-sdk = { git = "https://github.com/succinctlabs/sp1.git", rev = "277f1b4cfee5129bd40d74748f3d241cdfa56e63" }
 reqwest = { version = "0.11", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
@@ -24,4 +24,4 @@ subtle-encoding = "0.5.1"
 ethers = "2.0.14"
 anyhow = "1.0.82"
 [build-dependencies]
-sp1-helper = { git = "https://github.com/succinctlabs/sp1.git", rev = "7a57682bfd3afb33c6e1320d5723a851d42dd298" }
+sp1-helper = { git = "https://github.com/succinctlabs/sp1.git", rev = "277f1b4cfee5129bd40d74748f3d241cdfa56e63" }
