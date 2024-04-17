@@ -109,8 +109,14 @@ async fn main() -> anyhow::Result<()> {
         let latest_block_height = tendermint_client.get_latest_block_height().await;
 
         if next_block_height < latest_block_height {
+            let trusted_block = tendermint_client
+                .fetch_block_by_hash(&trusted_header_hash)
+                .await
+                .unwrap();
+            let trusted_height = trusted_block.result.block.header.height.value();
+
             let (trusted_light_block, target_light_block) = tendermint_client
-                .get_light_blocks(&trusted_header_hash, next_block_height)
+                .get_light_blocks(trusted_height, next_block_height)
                 .await;
 
             // Generate a proof of the update from trusted_light_block to target_light_block and get the corresponding

@@ -133,16 +133,13 @@ impl TendermintRPCClient {
 
     pub async fn get_light_blocks(
         &self,
-        trusted_header_hash: &[u8],
+        trusted_block_height: u64,
         target_block_height: u64,
     ) -> (LightBlock, LightBlock) {
         let peer_id = self.fetch_peer_id().await.unwrap();
 
-        let trusted_block = self.fetch_block_by_hash(trusted_header_hash).await.unwrap();
-        let trusted_height = trusted_block.result.block.header.height.value();
-
         let trusted_light_block = self
-            .fetch_light_block(trusted_height, peer_id, &self.url)
+            .fetch_light_block(trusted_block_height, peer_id, &self.url)
             .await
             .expect("Failed to generate light block 1");
         let target_light_block = self
