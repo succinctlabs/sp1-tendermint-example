@@ -5,8 +5,8 @@ name = "tendermint-operator"
 edition = "2021"
 
 [[bin]]
-name = "integrations"
-path = "bin/integrations.rs"
+name = "operator"
+path = "bin/tendermint_operator.rs"
 
 [[bin]]
 name = "fixture"
