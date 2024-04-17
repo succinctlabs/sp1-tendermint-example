@@ -6,7 +6,7 @@ edition = "2021"
 
 [[bin]]
 name = "operator"
-path = "bin/tendermint_operator.rs"
+path = "bin/operator.rs"
 
 [[bin]]
 name = "fixture"
