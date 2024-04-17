@@ -38,7 +38,7 @@ async fn generate_header_update_proof(
     stdin.write_vec(encoded_1);
     stdin.write_vec(encoded_2);
 
-    // Note: Uses PRIVATE_KEY by default.
+    // Note: Uses PRIVATE_KEY by default to initialize the client.
     let client = ProverClient::new();
 
     // Submit the proof request to the prover network and poll for the proof.
@@ -46,12 +46,12 @@ async fn generate_header_update_proof(
         .prove_remote_async(TENDERMINT_ELF, stdin)
         .await
         .expect("proving failed");
+    println!("Successfully generated proof!");
 
     // Verify proof.
     client
         .verify(TENDERMINT_ELF, &proof)
         .expect("verification failed");
-
     println!("Successfully verified proof!");
 
     // Return the public values.
@@ -125,15 +125,13 @@ async fn main() -> anyhow::Result<()> {
                 .send()
                 .await?
                 .await?;
-            if tx.is_some() {
-                println!("Transaction hash: {:?}", tx.unwrap().transaction_hash);
-            } else {
-                println!("Transaction failed");
-            }
 
-            println!(
-                "successfully generated and verified proof for the program! relayed to contract"
-            );
+            if let Some(tx) = tx {
+                println!(
+                    "Successfully relayed proof! Transaction hash: {:?}",
+                    tx.transaction_hash
+                );
+            }
         }
         // Sleep for 10 seconds.
         println!("sleeping for 10 seconds");
