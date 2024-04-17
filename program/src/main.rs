@@ -21,9 +21,6 @@ fn main() {
     let header_hash_1 = light_block_1.signed_header.header.hash();
     let header_hash_2 = light_block_2.signed_header.header.hash();
 
-    sp1_zkvm::io::commit_slice(header_hash_1.as_bytes());
-    sp1_zkvm::io::commit_slice(header_hash_2.as_bytes());
-
     let vp = ProdVerifier::default();
     let opt = Options {
         trust_threshold: Default::default(),
@@ -48,4 +45,12 @@ fn main() {
         }
         v => panic!("expected success, got: {:?}", v),
     }
+
+    // Now that we have verified our proof, we commit the header hashes to the zkVM to expose
+    // them as public values.
+    let header_hash_1 = light_block_1.signed_header.header.hash();
+    let header_hash_2 = light_block_2.signed_header.header.hash();
+
+    sp1_zkvm::io::commit_slice(header_hash_1.as_bytes());
+    sp1_zkvm::io::commit_slice(header_hash_2.as_bytes());
 }
