@@ -147,11 +147,11 @@ impl TendermintRPCClient {
         let peer_id = self.fetch_peer_id().await.unwrap();
 
         let trusted_light_block = self
-            .fetch_light_block(trusted_block_height, peer_id, &self.url)
+            .fetch_light_block(trusted_block_height, peer_id)
             .await
             .expect("Failed to generate light block 1");
         let target_light_block = self
-            .fetch_light_block(target_block_height, peer_id, &self.url)
+            .fetch_light_block(target_block_height, peer_id)
             .await
             .expect("Failed to generate light block 2");
         (trusted_light_block, target_light_block)
@@ -163,19 +163,18 @@ impl TendermintRPCClient {
         self.fetch_light_block(
             block.result.block.header.height.value(),
             hex::decode(peer_id).unwrap().try_into().unwrap(),
-            &self.url,
         )
         .await
         .unwrap()
     }
 
     pub async fn get_latest_block_height(&self) -> u64 {
-        let commit_url = format!("{}/commit", self.url);
-        let latest_commit = self.fetch_latest_commit(&commit_url).await.unwrap();
+        let latest_commit = self.fetch_latest_commit().await.unwrap();
         latest_commit.result.signed_header.header.height.value()
     }
 
-    pub async fn fetch_latest_commit(&self, url: &str) -> Result<CommitResponse, Box<dyn Error>> {
+    pub async fn fetch_latest_commit(&self) -> Result<CommitResponse, Box<dyn Error>> {
+        let url = format!("{}/commit", self.url);
         let client = Client::new();
 
         let response: CommitResponse = client
@@ -187,11 +186,9 @@ impl TendermintRPCClient {
         Ok(response)
     }
 
-    pub async fn fetch_commit(
-        &self,
-        url: &str,
-        block_height: u64,
-    ) -> Result<CommitResponse, Box<dyn Error>> {
+    pub async fn fetch_commit(&self, block_height: u64) -> Result<CommitResponse, Box<dyn Error>> {
+        let url = format!("{}/{}", self.url, "commit");
+
         let client = Client::new();
 
         let response: CommitResponse = client
@@ -207,18 +204,16 @@ impl TendermintRPCClient {
         Ok(response)
     }
 
-    pub async fn fetch_validators(
-        &self,
-        url: &str,
-        block_height: u64,
-    ) -> Result<Vec<Info>, Box<dyn Error>> {
+    pub async fn fetch_validators(&self, block_height: u64) -> Result<Vec<Info>, Box<dyn Error>> {
+        let url = format!("{}/{}", self.url, "validators");
+
         let client = Client::new();
         let mut validators = vec![];
         let mut collected_validators = 0;
         let mut page_index = 1;
         loop {
             let response = client
-                .get(url)
+                .get(&url)
                 .query(&[
                     ("height", block_height.to_string().as_str()),
                     ("per_page", "100"),
@@ -245,22 +240,15 @@ impl TendermintRPCClient {
         &self,
         block_height: u64,
         peer_id: [u8; 20],
-        base_url: &str,
     ) -> Result<LightBlock, Box<dyn Error>> {
-        let commit_response = self
-            .fetch_commit(&format!("{}/commit", base_url), block_height)
-            .await?;
+        let commit_response = self.fetch_commit(block_height).await?;
         let mut signed_header = commit_response.result.signed_header;
 
-        let validator_response = self
-            .fetch_validators(&format!("{}/validators", base_url), block_height)
-            .await?;
+        let validator_response = self.fetch_validators(block_height).await?;
 
         let validators = Set::new(validator_response, None);
 
-        let next_validator_response = self
-            .fetch_validators(&format!("{}/validators", base_url), block_height + 1)
-            .await?;
+        let next_validator_response = self.fetch_validators(block_height + 1).await?;
         let next_validators = Set::new(next_validator_response, None);
 
         self.sort_signatures_by_validators_power_desc(&mut signed_header, &validators);

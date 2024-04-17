@@ -1,4 +1,5 @@
 use crate::util::TendermintRPCClient;
+use serde::{Deserialize, Serialize};
 use sp1_sdk::{ProverClient, SP1Stdin};
 use tendermint_light_client_verifier::types::LightBlock;
 
@@ -7,6 +8,7 @@ pub mod util;
 
 const TENDERMINT_ELF: &[u8] = include_bytes!("../../program/elf/riscv32im-succinct-zkvm-elf");
 
+#[derive(Serialize, Deserialize)]
 pub struct ProofData {
     pub pv: Vec<u8>,
     pub proof: Vec<u8>,
@@ -33,9 +35,21 @@ pub async fn generate_header_update_proof_to_latest_block(
     Ok(proof_data)
 }
 
+pub async fn generate_header_update_proof_between_blocks(
+    trusted_block_height: u64,
+    target_block_height: u64,
+) -> anyhow::Result<ProofData> {
+    let tendermint_client = TendermintRPCClient::default();
+    let (trusted_light_block, target_light_block) = tendermint_client
+        .get_light_blocks(trusted_block_height, target_block_height)
+        .await;
+    let proof_data = generate_header_update_proof(&trusted_light_block, &target_light_block).await;
+    Ok(proof_data)
+}
+
 // Generate a proof of an update from trusted_light_block to target_light_block. Returns the public values and proof
 // of the update.
-async fn generate_header_update_proof(
+pub async fn generate_header_update_proof(
     trusted_light_block: &LightBlock,
     target_light_block: &LightBlock,
 ) -> ProofData {

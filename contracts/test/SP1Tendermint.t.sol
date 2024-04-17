@@ -7,32 +7,43 @@ import {DummyVerifier} from "../src/DummyVerifier.sol";
 
 contract SP1TendermintTest is Test {
     DummyVerifier public verifier;
-    SP1Tendermint public sp1;
+    bytes32 public programHash;
 
     function setUp() public {
         verifier = new DummyVerifier();
-        bytes32 dummyProgramHash = bytes32(0);
-        bytes32 trustedBlockHash = 0x41410655235f653628714eecd34b317e60b26ee3eae9127a13c2dd88f0e2a291;
-        sp1 = new SP1Tendermint(
-            dummyProgramHash,
+        programHash = bytes32(0);
+    }
+
+    // Helper function to bytes32 from bytes memory (useful for reading 32 bytes from pv).
+    function readBytes(
+        bytes calldata bs,
+        uint256 start,
+        uint256 end
+    ) public pure returns (bytes memory) {
+        return bs[start:end];
+    }
+
+    // Read from fixture.
+    function test_fixtureTest() public {
+        // Parse JSON {pv, proof} from fixture as bytes.
+        string memory fixture = vm.readFile("./fixtures/fixture_2:6.json");
+        (bytes memory pv, bytes memory proof) = abi.decode(
+            vm.parseJson(fixture),
+            (bytes, bytes)
+        );
+
+        // First 32 bytes of the public values of the pv are the trusted block hash.
+        // Read 32 bytes from pv.
+        bytes32 trustedBlockHash = bytes32(this.readBytes(pv, 0, 32));
+
+        // Initialize SP1Tendermint with program hash, verifier and the trusted block hash.
+        SP1Tendermint sp1 = new SP1Tendermint(
+            programHash,
             address(verifier),
             trustedBlockHash
         );
-    }
 
-    // Add fixture tests.
-
-    function test_integrationTest() public {}
-
-    function test_addNewBlockHash() public {
-        sp1.updateHeader(
-            hex"41410655235f653628714eecd34b317e60b26ee3eae9127a13c2dd88f0e2a2918f988d0d730aef11ae9c4f3cd9adfb3b6aac94a20948f037beeac22f8df362586753756363657373",
-            bytes("")
-        );
-        // Assert the new latestHeader is 0x8f988d0d730aef11ae9c4f3cd9adfb3b6aac94a20948f037beeac22f8df36258.
-        assertEq(
-            sp1.latestHeader(),
-            0x8f988d0d730aef11ae9c4f3cd9adfb3b6aac94a20948f037beeac22f8df36258
-        );
+        // Update SP1Tendermint using the saved proof.
+        sp1.updateHeader(pv, proof);
     }
 }
