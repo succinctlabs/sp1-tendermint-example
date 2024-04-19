@@ -5,7 +5,7 @@ name = "tendermint-program"
 edition = "2021"
 
 [dependencies]
-sp1-zkvm = { git = "https://github.com/succinctlabs/sp1.git" }
+sp1-zkvm = { git = "https://github.com/succinctlabs/sp1.git", rev = "277f1b4cfee5129bd40d74748f3d241cdfa56e63" }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 serde = { version = "1.0", default-features = false, features = ["derive"] }
 tendermint-light-client-verifier = { version = "0.35.0", default-features = false, features = [

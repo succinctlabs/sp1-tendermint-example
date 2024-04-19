@@ -1,0 +1,3 @@
+error_on_unformatted = true
+group_imports = "One"
+imports_granularity = "Crate"
