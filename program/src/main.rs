@@ -28,6 +28,10 @@ fn main() {
         trusting_period: Duration::from_secs(14 * 24 * 60 * 60),
         clock_drift: Default::default(),
     };
+
+    // Note: We assume that the light blocks are not out of date in order for the proof to be secure.
+    // Because there is no way for the circuit to know what the time of verification is (no OS),
+    // we have to trust that the light blocks are not out of date.
     let verify_time = light_block_2.time() + Duration::from_secs(20);
     let verdict = vp.verify_update_header(
         light_block_2.as_untrusted_state(),

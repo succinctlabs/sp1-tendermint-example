@@ -15,6 +15,19 @@ pub struct ProofData {
     pub proof: Vec<u8>,
 }
 
+// Fetches the inputs for the proof of an update from trusted_height to the latest block.
+pub async fn fetch_inputs(trusted_header_hash: &[u8]) -> anyhow::Result<(LightBlock, LightBlock)> {
+    let tendermint_client = TendermintRPCClient::default();
+    let latest_block_height = tendermint_client.get_latest_block_height().await;
+    let trusted_block_height = tendermint_client
+        .get_block_height_from_hash(trusted_header_hash)
+        .await;
+    let (trusted_light_block, target_light_block) = tendermint_client
+        .get_light_blocks(trusted_block_height, latest_block_height)
+        .await;
+    Ok((trusted_light_block, target_light_block))
+}
+
 // Generate a proof using the trusted_header_hash, fetch the latest block and generate a proof for that.
 pub async fn generate_header_update_proof_to_latest_block(
     trusted_header_hash: &[u8],
@@ -68,10 +81,7 @@ pub async fn generate_header_update_proof(
     stdin.write_vec(encoded_2);
 
     // Submit the proof request to the prover network and poll for the proof.
-    let proof = client
-        .prove_remote_async(TENDERMINT_ELF, stdin)
-        .await
-        .expect("proving failed");
+    let proof = client.prove(TENDERMINT_ELF, stdin).expect("proving failed");
     println!("Successfully generated proof!");
 
     // Verify proof.

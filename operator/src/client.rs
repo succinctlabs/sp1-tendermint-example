@@ -32,7 +32,7 @@ impl Default for ContractClient {
     }
 }
 
-// TODO: Rewrite this.
+// TODO: Move this to sp1_sdk or our contracts repo.
 impl ContractClient {
     /// Creates a new `ContractClient`.
     pub fn new(chain_id: u64, rpc_url: &str, private_key: &str, contract: &str) -> Result<Self> {

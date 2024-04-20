@@ -26,6 +26,7 @@ contract SP1TendermintTest is Test {
     // Read from fixture.
     function test_fixtureTest() public {
         // Parse JSON {pv, proof} from fixture as bytes.
+        // TODO: Parse the Groth16 proof and associated public values from the fixture.
         string memory fixture = vm.readFile("./fixtures/fixture_2:6.json");
         (bytes memory pv, bytes memory proof) = abi.decode(
             vm.parseJson(fixture),
