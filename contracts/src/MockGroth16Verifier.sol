@@ -3,7 +3,7 @@ pragma solidity >=0.5.0;
 
 import {INetworkVerifier} from "./INetworkVerifier.sol";
 
-contract DummyVerifier is INetworkVerifier {
+contract MockGroth16Verifier is INetworkVerifier {
     function version() external pure returns (string memory) {
         return "0.1.0";
     }

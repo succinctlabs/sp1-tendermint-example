@@ -1,4 +1,5 @@
 use alloy::{sol, sol_types::SolCall};
+use sp1_sdk::{ProverClient, SP1Prover};
 use std::time::Duration;
 use tendermint_operator::{client::ContractClient, generate_header_update_proof_to_latest_block};
 
@@ -16,6 +17,8 @@ sol! {
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
+
+    let prover_client = ProverClient::new();
     let contract_client = ContractClient::default();
 
     loop {
@@ -24,13 +27,18 @@ async fn main() -> anyhow::Result<()> {
         let trusted_header_hash = contract_client.read(latest_header_call_data).await?;
 
         // Generate a header update proof to the latest block.
-        let proof_data = generate_header_update_proof_to_latest_block(&trusted_header_hash).await;
+        let proof_data =
+            generate_header_update_proof_to_latest_block(&prover_client, &trusted_header_hash)
+                .await;
 
         // Relay the proof to the contract.
         if let Ok(proof_data) = proof_data {
             let update_header_call_data = SP1Tendermint::updateHeaderCall {
-                publicValues: proof_data.pv.into(),
-                proof: proof_data.proof.into(),
+                // publicValues: proof_data.pv.into(),
+                // proof: proof_data.proof.into(),
+                // TODO: fix
+                publicValues: vec![].into(),
+                proof: vec![].into(),
             }
             .abi_encode();
 

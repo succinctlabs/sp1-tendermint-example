@@ -1,4 +1,5 @@
 use clap::Parser;
+use sp1_sdk::ProverClient;
 use std::fs;
 use tendermint_operator::generate_header_update_proof_between_blocks;
 
@@ -30,10 +31,15 @@ async fn main() -> anyhow::Result<()> {
     sp1_sdk::utils::setup_logger();
 
     let args = FixtureArgs::parse();
+    let prover_client = ProverClient::new();
 
     // Generate a header update proof for the specified blocks.
-    let proof_data =
-        generate_header_update_proof_between_blocks(args.trusted_block, args.target_block).await;
+    let proof_data = generate_header_update_proof_between_blocks(
+        prover_client,
+        args.trusted_block,
+        args.target_block,
+    )
+    .await;
 
     if let Ok(proof_data) = proof_data {
         // Write the proof data to JSON.
