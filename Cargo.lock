@@ -5951,10 +5951,12 @@ version = "0.1.0"
 dependencies = [
  "alloy 0.1.0 (git+https://github.com/alloy-rs/alloy)",
  "anyhow",
+ "async-trait",
  "bincode",
  "clap",
  "dotenv",
  "ethers",
+ "hex",
  "itertools 0.12.1",
  "log",
  "reqwest 0.11.27",

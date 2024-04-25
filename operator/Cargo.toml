@@ -11,6 +11,10 @@ path = "bin/operator.rs"
 name = "fixture"
 path = "bin/fixture.rs"
 
+[[bin]]
+name = "vkey"
+path = "bin/vkey.rs"
+
 [dependencies]
 alloy = { git = "https://github.com/alloy-rs/alloy", features = ["sol-types"] }
 sp1-sdk = { path = "../../sp1/sdk" }
@@ -32,5 +36,7 @@ ethers = "2.0.14"
 anyhow = "1.0.82"
 clap = { version = "4.0", features = ["derive", "env"] }
 log = "0.4.21"
+async-trait = "0.1.80"
+hex = "0.4.3"
 [build-dependencies]
 sp1-helper = { git = "https://github.com/succinctlabs/sp1.git", rev = "277f1b4cfee5129bd40d74748f3d241cdfa56e63" }
