@@ -1,7 +1,7 @@
 use clap::Parser;
 use sp1_sdk::ProverClient;
-use std::fs;
-use tendermint_operator::generate_header_update_proof_between_blocks;
+use std::{env, fs};
+use tendermint_operator::{MockTendermintProver, RealTendermintProver, TendermintProver};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -34,12 +34,21 @@ async fn main() -> anyhow::Result<()> {
     let prover_client = ProverClient::new();
 
     // Generate a header update proof for the specified blocks.
-    let proof_data = generate_header_update_proof_between_blocks(
-        prover_client,
-        args.trusted_block,
-        args.target_block,
-    )
-    .await;
+    let proof_data = if env::var("REAL_PROOFS").unwrap_or("false".to_string()) == "true" {
+        RealTendermintProver::generate_header_update_proof_between_blocks(
+            &prover_client,
+            args.trusted_block,
+            args.target_block,
+        )
+        .await
+    } else {
+        MockTendermintProver::generate_header_update_proof_between_blocks(
+            &prover_client,
+            args.trusted_block,
+            args.target_block,
+        )
+        .await
+    };
 
     if let Ok(proof_data) = proof_data {
         // Write the proof data to JSON.

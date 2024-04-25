@@ -1,4 +1,3 @@
-[workspace]
 [package]
 version = "0.1.0"
 name = "tendermint-operator"
@@ -14,7 +13,7 @@ path = "bin/fixture.rs"
 
 [dependencies]
 alloy = { git = "https://github.com/alloy-rs/alloy", features = ["sol-types"] }
-sp1-sdk = { path = "../../curta-vm/sdk" }
+sp1-sdk = { path = "../../sp1/sdk" }
 reqwest = { version = "0.11", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
