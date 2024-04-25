@@ -97,7 +97,7 @@ dependencies = [
 [[package]]
 name = "alloy"
 version = "0.1.0"
-source = "git+https://github.com/alloy-rs/alloy#e9d73d19054ee9c84f93f93eaba14899977a52d5"
+source = "git+https://github.com/alloy-rs/alloy#bbef8de3fd203bf6feb26dc619f42b2bb2ecd4e3"
 dependencies = [
  "alloy-consensus 0.1.0 (git+https://github.com/alloy-rs/alloy)",
  "alloy-core",
@@ -126,7 +126,7 @@ dependencies = [
 [[package]]
 name = "alloy-consensus"
 version = "0.1.0"
-source = "git+https://github.com/alloy-rs/alloy#e9d73d19054ee9c84f93f93eaba14899977a52d5"
+source = "git+https://github.com/alloy-rs/alloy#bbef8de3fd203bf6feb26dc619f42b2bb2ecd4e3"
 dependencies = [
  "alloy-eips 0.1.0 (git+https://github.com/alloy-rs/alloy)",
  "alloy-primitives",
@@ -200,7 +200,7 @@ dependencies = [
 [[package]]
 name = "alloy-eips"
 version = "0.1.0"
-source = "git+https://github.com/alloy-rs/alloy#e9d73d19054ee9c84f93f93eaba14899977a52d5"
+source = "git+https://github.com/alloy-rs/alloy#bbef8de3fd203bf6feb26dc619f42b2bb2ecd4e3"
 dependencies = [
  "alloy-primitives",
  "alloy-rlp",
@@ -223,11 +223,12 @@ dependencies = [
 [[package]]
 name = "alloy-genesis"
 version = "0.1.0"
-source = "git+https://github.com/alloy-rs/alloy#e9d73d19054ee9c84f93f93eaba14899977a52d5"
+source = "git+https://github.com/alloy-rs/alloy#bbef8de3fd203bf6feb26dc619f42b2bb2ecd4e3"
 dependencies = [
  "alloy-primitives",
  "alloy-serde 0.1.0 (git+https://github.com/alloy-rs/alloy)",
  "serde",
+ "serde_json",
 ]
 
 [[package]]
@@ -256,7 +257,7 @@ dependencies = [
 [[package]]
 name = "alloy-json-rpc"
 version = "0.1.0"
-source = "git+https://github.com/alloy-rs/alloy#e9d73d19054ee9c84f93f93eaba14899977a52d5"
+source = "git+https://github.com/alloy-rs/alloy#bbef8de3fd203bf6feb26dc619f42b2bb2ecd4e3"
 dependencies = [
  "alloy-primitives",
  "serde",
@@ -285,7 +286,7 @@ dependencies = [
 [[package]]
 name = "alloy-network"
 version = "0.1.0"
-source = "git+https://github.com/alloy-rs/alloy#e9d73d19054ee9c84f93f93eaba14899977a52d5"
+source = "git+https://github.com/alloy-rs/alloy#bbef8de3fd203bf6feb26dc619f42b2bb2ecd4e3"
 dependencies = [
  "alloy-consensus 0.1.0 (git+https://github.com/alloy-rs/alloy)",
  "alloy-eips 0.1.0 (git+https://github.com/alloy-rs/alloy)",
@@ -350,7 +351,7 @@ dependencies = [
 [[package]]
 name = "alloy-provider"
 version = "0.1.0"
-source = "git+https://github.com/alloy-rs/alloy#e9d73d19054ee9c84f93f93eaba14899977a52d5"
+source = "git+https://github.com/alloy-rs/alloy#bbef8de3fd203bf6feb26dc619f42b2bb2ecd4e3"
 dependencies = [
  "alloy-eips 0.1.0 (git+https://github.com/alloy-rs/alloy)",
  "alloy-json-rpc 0.1.0 (git+https://github.com/alloy-rs/alloy)",
@@ -420,7 +421,7 @@ dependencies = [
 [[package]]
 name = "alloy-rpc-client"
 version = "0.1.0"
-source = "git+https://github.com/alloy-rs/alloy#e9d73d19054ee9c84f93f93eaba14899977a52d5"
+source = "git+https://github.com/alloy-rs/alloy#bbef8de3fd203bf6feb26dc619f42b2bb2ecd4e3"
 dependencies = [
  "alloy-json-rpc 0.1.0 (git+https://github.com/alloy-rs/alloy)",
  "alloy-transport 0.1.0 (git+https://github.com/alloy-rs/alloy)",
@@ -458,7 +459,7 @@ dependencies = [
 [[package]]
 name = "alloy-rpc-types"
 version = "0.1.0"
-source = "git+https://github.com/alloy-rs/alloy#e9d73d19054ee9c84f93f93eaba14899977a52d5"
+source = "git+https://github.com/alloy-rs/alloy#bbef8de3fd203bf6feb26dc619f42b2bb2ecd4e3"
 dependencies = [
  "alloy-consensus 0.1.0 (git+https://github.com/alloy-rs/alloy)",
  "alloy-eips 0.1.0 (git+https://github.com/alloy-rs/alloy)",
@@ -488,7 +489,7 @@ dependencies = [
 [[package]]
 name = "alloy-rpc-types-trace"
 version = "0.1.0"
-source = "git+https://github.com/alloy-rs/alloy#e9d73d19054ee9c84f93f93eaba14899977a52d5"
+source = "git+https://github.com/alloy-rs/alloy#bbef8de3fd203bf6feb26dc619f42b2bb2ecd4e3"
 dependencies = [
  "alloy-primitives",
  "alloy-rpc-types 0.1.0 (git+https://github.com/alloy-rs/alloy)",
@@ -510,7 +511,7 @@ dependencies = [
 [[package]]
 name = "alloy-serde"
 version = "0.1.0"
-source = "git+https://github.com/alloy-rs/alloy#e9d73d19054ee9c84f93f93eaba14899977a52d5"
+source = "git+https://github.com/alloy-rs/alloy#bbef8de3fd203bf6feb26dc619f42b2bb2ecd4e3"
 dependencies = [
  "alloy-primitives",
  "serde",
@@ -533,7 +534,7 @@ dependencies = [
 [[package]]
 name = "alloy-signer"
 version = "0.1.0"
-source = "git+https://github.com/alloy-rs/alloy#e9d73d19054ee9c84f93f93eaba14899977a52d5"
+source = "git+https://github.com/alloy-rs/alloy#bbef8de3fd203bf6feb26dc619f42b2bb2ecd4e3"
 dependencies = [
  "alloy-primitives",
  "async-trait",
@@ -637,7 +638,7 @@ dependencies = [
 [[package]]
 name = "alloy-transport"
 version = "0.1.0"
-source = "git+https://github.com/alloy-rs/alloy#e9d73d19054ee9c84f93f93eaba14899977a52d5"
+source = "git+https://github.com/alloy-rs/alloy#bbef8de3fd203bf6feb26dc619f42b2bb2ecd4e3"
 dependencies = [
  "alloy-json-rpc 0.1.0 (git+https://github.com/alloy-rs/alloy)",
  "base64 0.22.0",
@@ -668,7 +669,7 @@ dependencies = [
 [[package]]
 name = "alloy-transport-http"
 version = "0.1.0"
-source = "git+https://github.com/alloy-rs/alloy#e9d73d19054ee9c84f93f93eaba14899977a52d5"
+source = "git+https://github.com/alloy-rs/alloy#bbef8de3fd203bf6feb26dc619f42b2bb2ecd4e3"
 dependencies = [
  "alloy-json-rpc 0.1.0 (git+https://github.com/alloy-rs/alloy)",
  "alloy-transport 0.1.0 (git+https://github.com/alloy-rs/alloy)",
@@ -3786,7 +3787,7 @@ checksum = "b15813163c1d831bf4a13c3610c05c0d03b39feb07f7e09fa234dac9b15aaf39"
 [[package]]
 name = "p3-air"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#056f328a5096049b2b308fb6dc3497249e81d354"
+source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#aef4f8f03f960925f7088d757aeeb956a7f4b30c"
 dependencies = [
  "p3-field",
  "p3-matrix",
@@ -3795,7 +3796,7 @@ dependencies = [
 [[package]]
 name = "p3-baby-bear"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#056f328a5096049b2b308fb6dc3497249e81d354"
+source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#aef4f8f03f960925f7088d757aeeb956a7f4b30c"
 dependencies = [
  "num-bigint 0.4.4",
  "p3-field",
@@ -3809,7 +3810,7 @@ dependencies = [
 [[package]]
 name = "p3-blake3"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#056f328a5096049b2b308fb6dc3497249e81d354"
+source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#aef4f8f03f960925f7088d757aeeb956a7f4b30c"
 dependencies = [
  "blake3",
  "p3-symmetric",
@@ -3818,7 +3819,7 @@ dependencies = [
 [[package]]
 name = "p3-bn254-fr"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#056f328a5096049b2b308fb6dc3497249e81d354"
+source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#aef4f8f03f960925f7088d757aeeb956a7f4b30c"
 dependencies = [
  "ff 0.13.0",
  "num-bigint 0.4.4",
@@ -3832,7 +3833,7 @@ dependencies = [
 [[package]]
 name = "p3-challenger"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#056f328a5096049b2b308fb6dc3497249e81d354"
+source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#aef4f8f03f960925f7088d757aeeb956a7f4b30c"
 dependencies = [
  "p3-field",
  "p3-maybe-rayon",
@@ -3844,7 +3845,7 @@ dependencies = [
 [[package]]
 name = "p3-commit"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#056f328a5096049b2b308fb6dc3497249e81d354"
+source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#aef4f8f03f960925f7088d757aeeb956a7f4b30c"
 dependencies = [
  "itertools 0.12.1",
  "p3-challenger",
@@ -3857,7 +3858,7 @@ dependencies = [
 [[package]]
 name = "p3-dft"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#056f328a5096049b2b308fb6dc3497249e81d354"
+source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#aef4f8f03f960925f7088d757aeeb956a7f4b30c"
 dependencies = [
  "p3-field",
  "p3-matrix",
@@ -3869,7 +3870,7 @@ dependencies = [
 [[package]]
 name = "p3-field"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#056f328a5096049b2b308fb6dc3497249e81d354"
+source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#aef4f8f03f960925f7088d757aeeb956a7f4b30c"
 dependencies = [
  "itertools 0.12.1",
  "num-bigint 0.4.4",
@@ -3882,7 +3883,7 @@ dependencies = [
 [[package]]
 name = "p3-fri"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#056f328a5096049b2b308fb6dc3497249e81d354"
+source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#aef4f8f03f960925f7088d757aeeb956a7f4b30c"
 dependencies = [
  "itertools 0.12.1",
  "p3-challenger",
@@ -3900,7 +3901,7 @@ dependencies = [
 [[package]]
 name = "p3-interpolation"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#056f328a5096049b2b308fb6dc3497249e81d354"
+source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#aef4f8f03f960925f7088d757aeeb956a7f4b30c"
 dependencies = [
  "p3-field",
  "p3-matrix",
@@ -3910,7 +3911,7 @@ dependencies = [
 [[package]]
 name = "p3-keccak"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#056f328a5096049b2b308fb6dc3497249e81d354"
+source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#aef4f8f03f960925f7088d757aeeb956a7f4b30c"
 dependencies = [
  "p3-symmetric",
  "tiny-keccak",
@@ -3919,11 +3920,12 @@ dependencies = [
 [[package]]
 name = "p3-keccak-air"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#056f328a5096049b2b308fb6dc3497249e81d354"
+source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#aef4f8f03f960925f7088d757aeeb956a7f4b30c"
 dependencies = [
  "p3-air",
  "p3-field",
  "p3-matrix",
+ "p3-maybe-rayon",
  "p3-util",
  "tracing",
 ]
@@ -3931,7 +3933,7 @@ dependencies = [
 [[package]]
 name = "p3-matrix"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#056f328a5096049b2b308fb6dc3497249e81d354"
+source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#aef4f8f03f960925f7088d757aeeb956a7f4b30c"
 dependencies = [
  "itertools 0.12.1",
  "p3-field",
@@ -3945,7 +3947,7 @@ dependencies = [
 [[package]]
 name = "p3-maybe-rayon"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#056f328a5096049b2b308fb6dc3497249e81d354"
+source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#aef4f8f03f960925f7088d757aeeb956a7f4b30c"
 dependencies = [
  "rayon",
 ]
@@ -3953,9 +3955,9 @@ dependencies = [
 [[package]]
 name = "p3-mds"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#056f328a5096049b2b308fb6dc3497249e81d354"
+source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#aef4f8f03f960925f7088d757aeeb956a7f4b30c"
 dependencies = [
- "itertools 0.11.0",
+ "itertools 0.12.1",
  "p3-dft",
  "p3-field",
  "p3-matrix",
@@ -3967,7 +3969,7 @@ dependencies = [
 [[package]]
 name = "p3-merkle-tree"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#056f328a5096049b2b308fb6dc3497249e81d354"
+source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#aef4f8f03f960925f7088d757aeeb956a7f4b30c"
 dependencies = [
  "itertools 0.12.1",
  "p3-commit",
@@ -3983,7 +3985,7 @@ dependencies = [
 [[package]]
 name = "p3-poseidon2"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#056f328a5096049b2b308fb6dc3497249e81d354"
+source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#aef4f8f03f960925f7088d757aeeb956a7f4b30c"
 dependencies = [
  "gcd",
  "p3-field",
@@ -3995,7 +3997,7 @@ dependencies = [
 [[package]]
 name = "p3-symmetric"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#056f328a5096049b2b308fb6dc3497249e81d354"
+source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#aef4f8f03f960925f7088d757aeeb956a7f4b30c"
 dependencies = [
  "itertools 0.12.1",
  "p3-field",
@@ -4005,7 +4007,7 @@ dependencies = [
 [[package]]
 name = "p3-uni-stark"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#056f328a5096049b2b308fb6dc3497249e81d354"
+source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#aef4f8f03f960925f7088d757aeeb956a7f4b30c"
 dependencies = [
  "itertools 0.12.1",
  "p3-air",
@@ -4023,7 +4025,7 @@ dependencies = [
 [[package]]
 name = "p3-util"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#056f328a5096049b2b308fb6dc3497249e81d354"
+source = "git+https://github.com/Plonky3/Plonky3.git?branch=sp1#aef4f8f03f960925f7088d757aeeb956a7f4b30c"
 dependencies = [
  "serde",
 ]
@@ -6944,9 +6946,9 @@ dependencies = [
 
 [[package]]
 name = "zeroize"
-version = "1.8.0"
+version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "63381fa6624bf92130a6b87c0d07380116f80b565c42cf0d754136f0238359ef"
+checksum = "525b4ec142c6b68a2d10f01f7bbf6755599ca3f81ea53b8431b7dd348f5fdb2d"
 dependencies = [
  "zeroize_derive",
 ]

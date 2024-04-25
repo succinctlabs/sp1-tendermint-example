@@ -18,9 +18,8 @@ contract MockGroth16Verifier is INetworkVerifier {
         override
         returns (bool)
     {
-        bytes32 pvDigest = sha256(publicValues);
-
-        bytes32 expectedProof = sha256(abi.encodePacked(GROTH16_CODE, vkDigest, pvDigest));
-        return proof.length == 32 && abi.decode(proof, (bytes32)) == expectedProof;
+        bytes32 expectedProof = sha256(abi.encodePacked(GROTH16_CODE, vkDigest, publicValues));
+        bytes32 decodedProof = abi.decode(proof, (bytes32));
+        return decodedProof == expectedProof;
     }
 }

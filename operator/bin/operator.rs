@@ -41,8 +41,6 @@ async fn main() -> anyhow::Result<()> {
 
         // Relay the proof to the contract.
         if let Ok(proof_data) = proof_data {
-            println!("proof_data: {:?}", proof_data);
-
             let update_header_call_data = SP1Tendermint::updateHeaderCall {
                 publicValues: proof_data.pv.into(),
                 proof: proof_data.proof.into(),
