@@ -1,6 +1,7 @@
 use clap::Parser;
-use std::fs;
-use tendermint_operator::generate_header_update_proof_between_blocks;
+use sp1_sdk::{types::MockProver, ProverClient};
+use std::{env, fs};
+use tendermint_operator::{MockTendermintProver, RealTendermintProver, TendermintProver};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -21,7 +22,7 @@ struct FixtureArgs {
 /// Writes the proof data for the given trusted and target blocks to the given fixture path.
 /// Example:
 /// ```
-/// cargo run --bin fixture -- trusted_block=1 target_block=5
+/// cargo run --bin fixture --release -- --trusted-block=1 --target-block=5
 /// ```
 /// The fixture will be written to the path: ./contracts/fixtures/fixture_1:5.json
 #[tokio::main]
@@ -30,10 +31,18 @@ async fn main() -> anyhow::Result<()> {
     sp1_sdk::utils::setup_logger();
 
     let args = FixtureArgs::parse();
+    let real_proofs = env::var("REAL_PROOFS").unwrap_or("false".to_string()) == "true";
+    let prover: Box<dyn TendermintProver> = if real_proofs {
+        let prover_client = ProverClient::new();
+        Box::new(RealTendermintProver::new(prover_client))
+    } else {
+        Box::new(MockTendermintProver::new(MockProver::new()))
+    };
 
     // Generate a header update proof for the specified blocks.
-    let proof_data =
-        generate_header_update_proof_between_blocks(args.trusted_block, args.target_block).await;
+    let proof_data = prover
+        .generate_header_update_proof_between_blocks(args.trusted_block, args.target_block)
+        .await;
 
     if let Ok(proof_data) = proof_data {
         // Write the proof data to JSON.

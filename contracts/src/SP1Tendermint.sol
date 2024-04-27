@@ -8,11 +8,7 @@ contract SP1Tendermint {
     bytes32 public tendermintProgramHash;
     bytes32 public latestHeader;
 
-    constructor(
-        bytes32 _tendermintProgramHash,
-        address _verifier,
-        bytes32 _initialBlockHash
-    ) {
+    constructor(bytes32 _tendermintProgramHash, address _verifier, bytes32 _initialBlockHash) {
         verifier = INetworkVerifier(_verifier);
         tendermintProgramHash = _tendermintProgramHash;
         latestHeader = _initialBlockHash;
@@ -26,10 +22,7 @@ contract SP1Tendermint {
         verifier = INetworkVerifier(_verifier);
     }
 
-    function updateHeader(
-        bytes calldata publicValues,
-        bytes calldata proof
-    ) public {
+    function updateHeader(bytes calldata publicValues, bytes calldata proof) public {
         // Extract the first 32 bytes of the public values.
         bytes memory proofTrustedHeader = publicValues[0:32];
         if (bytes32(proofTrustedHeader) != latestHeader) {
@@ -38,7 +31,7 @@ contract SP1Tendermint {
 
         /// @dev In the dummy verifier, the program hash and proof are not used.
         // Verify the proof with the associated public values.
-        verifier.verify(tendermintProgramHash, publicValues, proof);
+        assert(verifier.verify(tendermintProgramHash, publicValues, proof));
 
         /// The next 32 bytes of the public values are the new trusted block hash. Set the latest
         // header to the new header.

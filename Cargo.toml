@@ -1,0 +1,4 @@
+[workspace]
+exclude = ["program"]
+members = ["operator"]
+resolver = "2"

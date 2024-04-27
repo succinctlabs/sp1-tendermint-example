@@ -1,6 +1,9 @@
 use alloy::{sol, sol_types::SolCall};
-use std::time::Duration;
-use tendermint_operator::{client::ContractClient, generate_header_update_proof_to_latest_block};
+use sp1_sdk::{types::MockProver, ProverClient};
+use std::{env, time::Duration};
+use tendermint_operator::{
+    client::ContractClient, MockTendermintProver, RealTendermintProver, TendermintProver,
+};
 
 sol! {
     contract SP1Tendermint {
@@ -16,7 +19,15 @@ sol! {
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
+
     let contract_client = ContractClient::default();
+    let real_proofs = env::var("REAL_PROOFS").unwrap_or("false".to_string()) == "true";
+    let prover: Box<dyn TendermintProver> = if real_proofs {
+        let prover_client = ProverClient::new();
+        Box::new(RealTendermintProver::new(prover_client))
+    } else {
+        Box::new(MockTendermintProver::new(MockProver::new()))
+    };
 
     loop {
         // Read the existing trusted header hash from the contract.
@@ -24,7 +35,9 @@ async fn main() -> anyhow::Result<()> {
         let trusted_header_hash = contract_client.read(latest_header_call_data).await?;
 
         // Generate a header update proof to the latest block.
-        let proof_data = generate_header_update_proof_to_latest_block(&trusted_header_hash).await;
+        let proof_data = prover
+            .generate_header_update_proof_to_latest_block(&trusted_header_hash)
+            .await;
 
         // Relay the proof to the contract.
         if let Ok(proof_data) = proof_data {
