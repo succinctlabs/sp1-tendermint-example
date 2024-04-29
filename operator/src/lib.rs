@@ -8,6 +8,7 @@ use std::str::FromStr;
 use tendermint_light_client_verifier::types::LightBlock;
 
 pub mod client;
+mod types;
 pub mod util;
 
 // The path to the ELF file for the Succinct zkVM program.
@@ -42,22 +43,8 @@ pub trait TendermintProver: Send + Sync {
         let trusted_block_height = tendermint_client
             .get_block_height_from_hash(trusted_header_hash)
             .await;
-        log::info!(
-            "SP1Tendermint contract's latest block height: {}",
-            trusted_block_height
-        );
-        log::info!(
-            "Generating proof for blocks {} to {} (latest)",
-            trusted_block_height,
-            latest_block_height
-        );
-        let (trusted_light_block, target_light_block) = tendermint_client
-            .get_light_blocks(trusted_block_height, latest_block_height)
-            .await;
-        let proof_data = self
-            .generate_header_update_proof(&trusted_light_block, &target_light_block)
-            .await;
-        Ok(proof_data)
+        self.generate_header_update_proof_between_blocks(trusted_block_height, latest_block_height)
+            .await
     }
 
     async fn generate_header_update_proof_between_blocks(
@@ -188,3 +175,5 @@ impl TendermintProver for MockTendermintProver {
         }
     }
 }
+
+mod tests {}

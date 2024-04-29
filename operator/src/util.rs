@@ -1,4 +1,5 @@
 #![allow(dead_code)]
+use crate::types::*;
 use reqwest::Client;
 use serde::Deserialize;
 use std::{collections::HashMap, env, error::Error};
@@ -10,55 +11,6 @@ use tendermint::{
     Block,
 };
 use tendermint_light_client_verifier::types::{LightBlock, ValidatorSet};
-
-#[derive(Debug, Deserialize)]
-pub struct PeerIdResponse {
-    pub result: PeerIdWrapper,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct PeerIdWrapper {
-    pub node_info: NodeInfoWrapper,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct NodeInfoWrapper {
-    pub id: String,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct BlockResponse {
-    pub result: BlockWrapper,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct BlockWrapper {
-    pub block_id: Option<block::Id>,
-    pub block: Block,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct CommitResponse {
-    pub result: SignedHeaderWrapper,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct SignedHeaderWrapper {
-    pub signed_header: SignedHeader,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct ValidatorSetResponse {
-    pub result: BlockValidatorSet,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct BlockValidatorSet {
-    pub block_height: String,
-    pub validators: Vec<Info>,
-    pub count: String,
-    pub total: String,
-}
 
 pub struct TendermintRPCClient {
     url: String,
@@ -77,8 +29,39 @@ impl TendermintRPCClient {
         TendermintRPCClient { url }
     }
 
+    /// Retrieves light blocks for the trusted and target block heights.
+    pub async fn get_light_blocks(
+        &self,
+        trusted_block_height: u64,
+        target_block_height: u64,
+    ) -> (LightBlock, LightBlock) {
+        let peer_id = self.fetch_peer_id().await.unwrap();
+
+        let trusted_light_block = self
+            .fetch_light_block(trusted_block_height, peer_id)
+            .await
+            .expect("Failed to generate light block 1");
+        let target_light_block = self
+            .fetch_light_block(target_block_height, peer_id)
+            .await
+            .expect("Failed to generate light block 2");
+        (trusted_light_block, target_light_block)
+    }
+
+    /// Retrieves the latest block height from the Tendermint node.
+    pub async fn get_latest_block_height(&self) -> u64 {
+        let latest_commit = self.fetch_latest_commit().await.unwrap();
+        latest_commit.result.signed_header.header.height.value()
+    }
+
+    /// Retrieves the block height from a given block hash.
+    pub async fn get_block_height_from_hash(&self, hash: &[u8]) -> u64 {
+        let block = self.fetch_block_by_hash(hash).await.unwrap();
+        block.result.block.header.height.value()
+    }
+
     /// Sorts the signatures in the signed header based on the descending order of validators' power.
-    pub fn sort_signatures_by_validators_power_desc(
+    fn sort_signatures_by_validators_power_desc(
         &self,
         signed_header: &mut SignedHeader,
         validators_set: &ValidatorSet,
@@ -103,7 +86,7 @@ impl TendermintRPCClient {
     }
 
     /// Fetches the peer ID from the Tendermint node.
-    pub async fn fetch_peer_id(&self) -> Result<[u8; 20], Box<dyn Error>> {
+    async fn fetch_peer_id(&self) -> Result<[u8; 20], Box<dyn Error>> {
         let client = Client::new();
         let fetch_peer_id_url = format!("{}/status", self.url);
 
@@ -120,14 +103,8 @@ impl TendermintRPCClient {
             .unwrap())
     }
 
-    /// Retrieves the block height from a given block hash.
-    pub async fn get_block_height_from_hash(&self, hash: &[u8]) -> u64 {
-        let block = self.fetch_block_by_hash(hash).await.unwrap();
-        block.result.block.header.height.value()
-    }
-
     /// Fetches a block by its hash.
-    pub async fn fetch_block_by_hash(&self, hash: &[u8]) -> Result<BlockResponse, Box<dyn Error>> {
+    async fn fetch_block_by_hash(&self, hash: &[u8]) -> Result<BlockResponse, Box<dyn Error>> {
         let client = Client::new();
         let block_by_hash_url = format!(
             "{}/block_by_hash?hash=0x{}",
@@ -143,27 +120,8 @@ impl TendermintRPCClient {
         Ok(response)
     }
 
-    /// Retrieves light blocks for the trusted and target block heights.
-    pub async fn get_light_blocks(
-        &self,
-        trusted_block_height: u64,
-        target_block_height: u64,
-    ) -> (LightBlock, LightBlock) {
-        let peer_id = self.fetch_peer_id().await.unwrap();
-
-        let trusted_light_block = self
-            .fetch_light_block(trusted_block_height, peer_id)
-            .await
-            .expect("Failed to generate light block 1");
-        let target_light_block = self
-            .fetch_light_block(target_block_height, peer_id)
-            .await
-            .expect("Failed to generate light block 2");
-        (trusted_light_block, target_light_block)
-    }
-
     /// Fetches a light block by its hash.
-    pub async fn get_light_block_by_hash(&self, hash: &[u8]) -> LightBlock {
+    async fn get_light_block_by_hash(&self, hash: &[u8]) -> LightBlock {
         let block = self.fetch_block_by_hash(hash).await.unwrap();
         let peer_id = self.fetch_peer_id().await.unwrap();
         self.fetch_light_block(
@@ -174,14 +132,8 @@ impl TendermintRPCClient {
         .unwrap()
     }
 
-    /// Retrieves the latest block height from the Tendermint node.
-    pub async fn get_latest_block_height(&self) -> u64 {
-        let latest_commit = self.fetch_latest_commit().await.unwrap();
-        latest_commit.result.signed_header.header.height.value()
-    }
-
     /// Fetches the latest commit from the Tendermint node.
-    pub async fn fetch_latest_commit(&self) -> Result<CommitResponse, Box<dyn Error>> {
+    async fn fetch_latest_commit(&self) -> Result<CommitResponse, Box<dyn Error>> {
         let url = format!("{}/commit", self.url);
         let client = Client::new();
 
@@ -195,7 +147,7 @@ impl TendermintRPCClient {
     }
 
     /// Fetches a commit for a specific block height.
-    pub async fn fetch_commit(&self, block_height: u64) -> Result<CommitResponse, Box<dyn Error>> {
+    async fn fetch_commit(&self, block_height: u64) -> Result<CommitResponse, Box<dyn Error>> {
         let url = format!("{}/{}", self.url, "commit");
 
         let client = Client::new();
@@ -214,7 +166,7 @@ impl TendermintRPCClient {
     }
 
     /// Fetches validators for a specific block height.
-    pub async fn fetch_validators(&self, block_height: u64) -> Result<Vec<Info>, Box<dyn Error>> {
+    async fn fetch_validators(&self, block_height: u64) -> Result<Vec<Info>, Box<dyn Error>> {
         let url = format!("{}/{}", self.url, "validators");
 
         let client = Client::new();
@@ -247,7 +199,7 @@ impl TendermintRPCClient {
     }
 
     /// Fetches a light block for a specific block height and peer ID.
-    pub async fn fetch_light_block(
+    async fn fetch_light_block(
         &self,
         block_height: u64,
         peer_id: [u8; 20],
