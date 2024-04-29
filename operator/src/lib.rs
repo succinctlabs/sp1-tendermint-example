@@ -1,17 +1,16 @@
+// TODO: import from sp1_sdk when these are public in the future
 use crate::util::TendermintRPCClient;
 use alloy::{primitives::Uint, sol, sol_types::SolValue};
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
-use sp1_sdk::{
-    types::{MockProver, Prover},
-    ProverClient, SP1Stdin,
-};
+use sp1_sdk::{prove::MockProver, ProverClient, SP1ProvingKey, SP1Stdin, SP1VerifyingKey};
 use std::str::FromStr;
 use tendermint_light_client_verifier::types::LightBlock;
 
 pub mod client;
 pub mod util;
 
+// The path to the ELF file for the Succinct zkVM program.
 pub const TENDERMINT_ELF: &[u8] = include_bytes!("../../program/elf/riscv32im-succinct-zkvm-elf");
 
 /// Proof data ready to be sent to the contract.
@@ -43,9 +42,14 @@ pub trait TendermintProver: Send + Sync {
         let trusted_block_height = tendermint_client
             .get_block_height_from_hash(trusted_header_hash)
             .await;
-        println!(
+        log::info!(
             "SP1Tendermint contract's latest block height: {}",
             trusted_block_height
+        );
+        log::info!(
+            "Generating proof for blocks {} to {} (latest)",
+            trusted_block_height,
+            latest_block_height
         );
         let (trusted_light_block, target_light_block) = tendermint_client
             .get_light_blocks(trusted_block_height, latest_block_height)
@@ -61,6 +65,11 @@ pub trait TendermintProver: Send + Sync {
         trusted_block_height: u64,
         target_block_height: u64,
     ) -> anyhow::Result<ProofData> {
+        log::info!(
+            "Generating proof for blocks {} to {}",
+            trusted_block_height,
+            target_block_height
+        );
         let tendermint_client = TendermintRPCClient::default();
         let (trusted_light_block, target_light_block) = tendermint_client
             .get_light_blocks(trusted_block_height, target_block_height)
@@ -78,29 +87,39 @@ pub trait TendermintProver: Send + Sync {
         trusted_light_block: &LightBlock,
         target_light_block: &LightBlock,
     ) -> ProofData {
-        // TODO: normally we could just write the LightBlock, but bincode doesn't work with LightBlock.
-        // let encoded: Vec<u8> = bincode::serialize(&light_block_1).unwrap();
-        // let decoded: LightBlock = bincode::deserialize(&encoded[..]).unwrap();
+        // Encode the light blocks to be input into our program.
         let encoded_1 = serde_cbor::to_vec(&trusted_light_block).unwrap();
         let encoded_2 = serde_cbor::to_vec(&target_light_block).unwrap();
 
+        // Write the encoded light blocks to stdin.
         let mut stdin = SP1Stdin::new();
         stdin.write_vec(encoded_1);
         stdin.write_vec(encoded_2);
 
+        // Generate proof.
         self.generate_proof(stdin).await
     }
 
+    // This function is used to generate a proof. Implementations of this trait can implement
+    // this method with either a local or network prover.
     async fn generate_proof(&self, stdin: SP1Stdin) -> ProofData;
 }
 
 pub struct RealTendermintProver {
     prover_client: ProverClient,
+    pkey: SP1ProvingKey,
+    vkey: SP1VerifyingKey,
 }
 
 impl RealTendermintProver {
     pub fn new(prover_client: ProverClient) -> Self {
-        Self { prover_client }
+        // With the prover_client, set up the proving key and verifying key.
+        let (pkey, vkey) = prover_client.setup(TENDERMINT_ELF);
+        Self {
+            prover_client,
+            pkey,
+            vkey,
+        }
     }
 }
 
@@ -110,13 +129,14 @@ impl TendermintProver for RealTendermintProver {
         // Generate the proof. Depending on SP1_PROVER env, this may be a local or network proof.
         let proof = self
             .prover_client
-            .prove_groth16(TENDERMINT_ELF, stdin)
+            .prove_groth16(&self.pkey, stdin)
             .expect("proving failed");
         println!("Successfully generated proof!");
 
         // Verify proof.
-        // proof.verify().expect("verification failed");
-        // println!("Successfully verified proof!");
+        self.prover_client
+            .verify_groth16(&proof, &self.vkey)
+            .expect("Verification failed");
 
         let proof_abi = Groth16Proof {
             a: [

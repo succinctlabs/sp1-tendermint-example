@@ -1,4 +1,4 @@
-use sp1_sdk::types::MockProver;
+use sp1_sdk::prove::MockProver;
 use tendermint_operator::TENDERMINT_ELF;
 
 /// Generates the vkey digest for the tendermint program.

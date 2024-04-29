@@ -1,5 +1,5 @@
 use clap::Parser;
-use sp1_sdk::{types::MockProver, ProverClient};
+use sp1_sdk::{prove::MockProver, ProverClient};
 use std::{env, fs};
 use tendermint_operator::{MockTendermintProver, RealTendermintProver, TendermintProver};
 
@@ -22,7 +22,7 @@ struct FixtureArgs {
 /// Writes the proof data for the given trusted and target blocks to the given fixture path.
 /// Example:
 /// ```
-/// cargo run --bin fixture --release -- --trusted-block=1 --target-block=5
+/// REAL_PROOF=true RUST_LOG=info cargo run --bin fixture --release -- --trusted-block=1 --target-block=5
 /// ```
 /// The fixture will be written to the path: ./contracts/fixtures/fixture_1:5.json
 #[tokio::main]

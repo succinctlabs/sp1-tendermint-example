@@ -1,5 +1,5 @@
 use alloy::{sol, sol_types::SolCall};
-use sp1_sdk::{types::MockProver, ProverClient};
+use sp1_sdk::{prove::MockProver, ProverClient};
 use std::{env, time::Duration};
 use tendermint_operator::{
     client::ContractClient, MockTendermintProver, RealTendermintProver, TendermintProver,
@@ -20,8 +20,13 @@ sol! {
 async fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
 
+    // Instantiate a contract client to interact with the deployed Solidity Tendermint contract.
     let contract_client = ContractClient::default();
+
+    // Whether to use real proofs or mock proofs. Defaults to mock proofs.
     let real_proofs = env::var("REAL_PROOFS").unwrap_or("false".to_string()) == "true";
+
+    // Instantiate a Tendermint prover based on the environment variable.
     let prover: Box<dyn TendermintProver> = if real_proofs {
         let prover_client = ProverClient::new();
         Box::new(RealTendermintProver::new(prover_client))
