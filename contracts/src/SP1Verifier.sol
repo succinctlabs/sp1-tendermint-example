@@ -8,7 +8,7 @@ contract SP1Verifier is Verifier {
         bytes32 vkeyHash,
         bytes memory proof,
         bytes memory publicValues
-    ) public view {
+    ) public view returns (bool) {
         uint256[8] memory proofArray = abi.decode(proof, (uint256[8]));
         uint256[2] memory publicInputs;
         // Trim to lowest 253 bits

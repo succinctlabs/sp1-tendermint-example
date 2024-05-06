@@ -1,10 +1,6 @@
 // TODO: import from sp1_sdk when these are public in the future
 use crate::util::TendermintRPCClient;
-use alloy::{primitives::Uint, sol, sol_types::SolValue};
-use async_trait::async_trait;
-use serde::{Deserialize, Serialize};
 use sp1_sdk::{ProverClient, SP1Groth16Proof, SP1ProvingKey, SP1Stdin, SP1VerifyingKey};
-use std::str::FromStr;
 use tendermint_light_client_verifier::types::LightBlock;
 
 pub mod client;
@@ -18,6 +14,12 @@ pub struct TendermintProver {
     prover_client: ProverClient,
     pkey: SP1ProvingKey,
     vkey: SP1VerifyingKey,
+}
+
+impl Default for TendermintProver {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl TendermintProver {

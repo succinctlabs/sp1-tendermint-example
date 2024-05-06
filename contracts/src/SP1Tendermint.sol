@@ -9,21 +9,21 @@ contract SP1Tendermint {
     bytes32 public latestHeader;
 
     constructor(
-        bytes32 tendermintProgramVkey,
-        address verifier,
-        bytes32 initialBlockHash
+        bytes32 _tendermintProgramVkey,
+        address _verifier,
+        bytes32 _initialBlockHash
     ) {
-        verifier = SP1Verifier(verifier);
-        tendermintProgramVkey = tendermintProgramVkey;
-        latestHeader = initialBlockHash;
+        verifier = SP1Verifier(_verifier);
+        tendermintProgramVkey = _tendermintProgramVkey;
+        latestHeader = _initialBlockHash;
     }
 
-    function updateProgramHash(bytes32 tendermintProgramVkey) public {
-        tendermintProgramVkey = tendermintProgramVkey;
+    function updateProgramHash(bytes32 _tendermintProgramVkey) public {
+        tendermintProgramVkey = _tendermintProgramVkey;
     }
 
-    function updateVerifier(address verifier) public {
-        verifier = SP1Verifier(verifier);
+    function updateVerifier(address _verifier) public {
+        verifier = SP1Verifier(_verifier);
     }
 
     function updateHeader(

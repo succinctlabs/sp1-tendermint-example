@@ -22,7 +22,7 @@ To generate fixtures for local testing run:
 
 ```shell
 $ cd operator
-$ RUST_LOG=info TENDERMINT_RPC_URL="https://rpc.celestia-mocha.com/" cargo run --release --bin fixture -- --trusted-block 2 --target-block 6
+$ RUST_LOG=debug TENDERMINT_RPC_URL="https://rpc.celestia-mocha.com/" cargo run --release --bin fixture -- --trusted-block 2 --target-block 6
 ```
 
 This will take around 10 minutes to complete (as benchmarked on a Macbook Pro M2), as it is generating a full Tendermint proof locally (including recursive aggregation + groth16 verification). In this case, the "core proof" will generate quickly, but the recursive aggregation will take longer because the core proof has several precompiles enabled that cause recursive aggregation to take longer than in the case of a simpler program.

@@ -1,11 +1,9 @@
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use tendermint::{
     block::{self, signed_header::SignedHeader},
-    node::Id,
-    validator::{Info, Set},
+    validator::Info,
     Block,
 };
-use tendermint_light_client_verifier::types::{LightBlock, ValidatorSet};
 
 #[derive(Debug, Deserialize)]
 pub struct PeerIdResponse {
@@ -27,6 +25,7 @@ pub struct BlockResponse {
     pub result: BlockWrapper,
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub struct BlockWrapper {
     pub block_id: Option<block::Id>,
@@ -48,6 +47,7 @@ pub struct ValidatorSetResponse {
     pub result: BlockValidatorSet,
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub struct BlockValidatorSet {
     pub block_height: String,
