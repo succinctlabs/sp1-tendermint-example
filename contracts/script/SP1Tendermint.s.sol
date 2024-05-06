@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Script, console} from "forge-std/Script.sol";
-import {MockGroth16Verifier} from "../src/MockGroth16Verifier.sol";
+import {SP1Verifier} from "../src/SP1Verifier.sol";
 import {SP1Tendermint} from "../src/SP1Tendermint.sol";
 
 contract SP1TendermintScript is Script {
@@ -11,8 +11,8 @@ contract SP1TendermintScript is Script {
     function run() public returns (address) {
         vm.startBroadcast();
 
-        // Deploy MockGroth16Verifier.
-        MockGroth16Verifier verifier = new MockGroth16Verifier();
+        // Deploy SP1Verifier.
+        MockGroth16Verifier verifier = new SP1Verifier();
         address verifierAddress = address(verifier);
 
         // TODO: Generate the inputs from "cargo build". Output "trustedBlockHash" and "programHash" to a JSON which this script can read.

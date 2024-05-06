@@ -1,14 +1,12 @@
 #![allow(dead_code)]
 use crate::types::*;
 use reqwest::Client;
-use serde::Deserialize;
 use std::{collections::HashMap, env, error::Error};
 use subtle_encoding::hex;
 use tendermint::{
-    block::{self, signed_header::SignedHeader},
+    block::signed_header::SignedHeader,
     node::Id,
     validator::{Info, Set},
-    Block,
 };
 use tendermint_light_client_verifier::types::{LightBlock, ValidatorSet};
 
