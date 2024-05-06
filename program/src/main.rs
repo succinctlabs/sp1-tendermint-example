@@ -7,19 +7,13 @@ use tendermint_light_client_verifier::{
 };
 
 fn main() {
-    // Normally we could just do this to read in the LightBlocks, but bincode doesn't work with LightBlock.
-    // This is likely a bug in tendermint-rs.
-    // let light_block_1 = sp1_zkvm::io::read::<LightBlock>();
-    // let light_block_2 = sp1_zkvm::io::read::<LightBlock>();
-
+    // Read in 2 encoded vectors of two light blocks from the zkVM's stdin.
     let encoded_1 = sp1_zkvm::io::read_vec();
     let encoded_2 = sp1_zkvm::io::read_vec();
 
+    // Decode the light blocks.
     let light_block_1: LightBlock = serde_cbor::from_slice(&encoded_1).unwrap();
     let light_block_2: LightBlock = serde_cbor::from_slice(&encoded_2).unwrap();
-
-    let header_hash_1 = light_block_1.signed_header.header.hash();
-    let header_hash_2 = light_block_2.signed_header.header.hash();
 
     let vp = ProdVerifier::default();
     let opt = Options {
@@ -28,7 +22,6 @@ fn main() {
         trusting_period: Duration::from_secs(14 * 24 * 60 * 60),
         clock_drift: Default::default(),
     };
-    // TODO: To prevent long range attacks, time should be witnessed, committed, and checked onchain.
     let verify_time = light_block_2.time() + Duration::from_secs(20);
     let verdict = vp.verify_update_header(
         light_block_2.as_untrusted_state(),
