@@ -31,6 +31,7 @@ async fn main() -> anyhow::Result<()> {
 
     let args = FixtureArgs::parse();
 
+    // std::env::set_var("SP1_PROVER", "mock");
     let prover = TendermintProver::new();
 
     // Generate a header update proof for the specified blocks.

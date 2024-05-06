@@ -36,10 +36,8 @@ contract SP1Tendermint {
             revert("Trusted block hash and public values do not match");
         }
 
-        // Verify the proof with the associated public values.
-        assert(
-            verifier.verifySP1Proof(tendermintProgramVkey, proof, publicValues)
-        );
+        // Verify the proof with the associated public values. This will revert if proof invalid.
+        verifier.verifySP1Proof(tendermintProgramVkey, proof, publicValues);
 
         /// The next 32 bytes of the public values are the new trusted block hash. Set the latest
         // header to the new header.

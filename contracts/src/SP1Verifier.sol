@@ -4,11 +4,12 @@ pragma solidity ^0.8.13;
 import {Verifier} from "./Groth16Verifier.sol";
 
 contract SP1Verifier is Verifier {
+    /// Will revert if the proof is invalid.
     function verifySP1Proof(
         bytes32 vkeyHash,
         bytes memory proof,
         bytes memory publicValues
-    ) public view returns (bool) {
+    ) public view {
         uint256[8] memory proofArray = abi.decode(proof, (uint256[8]));
         uint256[2] memory publicInputs;
         // Trim to lowest 253 bits
