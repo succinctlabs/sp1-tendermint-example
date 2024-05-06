@@ -12,7 +12,7 @@ contract SP1TendermintScript is Script {
         vm.startBroadcast();
 
         // Deploy SP1Verifier.
-        MockGroth16Verifier verifier = new SP1Verifier();
+        SP1Verifier verifier = new SP1Verifier();
         address verifierAddress = address(verifier);
 
         // TODO: Generate the inputs from "cargo build". Output "trustedBlockHash" and "programHash" to a JSON which this script can read.
