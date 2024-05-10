@@ -1,6 +1,6 @@
 use alloy::{sol, sol_types::SolCall};
 use std::time::Duration;
-use tendermint_operator::{client::ContractClient, TendermintProver};
+use tendermint_operator::{contract::ContractClient, TendermintProver};
 
 sol! {
     contract SP1Tendermint {

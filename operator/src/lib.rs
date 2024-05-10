@@ -3,7 +3,7 @@ use crate::util::TendermintRPCClient;
 use sp1_sdk::{ProverClient, SP1Groth16Proof, SP1ProvingKey, SP1Stdin, SP1VerifyingKey};
 use tendermint_light_client_verifier::types::LightBlock;
 
-pub mod client;
+pub mod contract;
 mod types;
 pub mod util;
 
