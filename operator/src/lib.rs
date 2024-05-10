@@ -11,9 +11,9 @@ pub mod util;
 pub const TENDERMINT_ELF: &[u8] = include_bytes!("../../program/elf/riscv32im-succinct-zkvm-elf");
 
 pub struct TendermintProver {
-    prover_client: ProverClient,
-    pkey: SP1ProvingKey,
-    vkey: SP1VerifyingKey,
+    pub prover_client: ProverClient,
+    pub pkey: SP1ProvingKey,
+    pub vkey: SP1VerifyingKey,
 }
 
 impl Default for TendermintProver {
@@ -68,6 +68,27 @@ impl TendermintProver {
             .await;
         self.generate_header_update_proof(&trusted_light_block, &target_light_block)
             .await
+    }
+
+    pub async fn fetch_input_for_header_update_proof(
+        &self,
+        trusted_block_height: u64,
+        target_block_height: u64,
+    ) -> SP1Stdin {
+        let tendermint_client = TendermintRPCClient::default();
+        let (trusted_light_block, target_light_block) = tendermint_client
+            .get_light_blocks(trusted_block_height, target_block_height)
+            .await;
+        // Encode the light blocks to be input into our program.
+        let encoded_1 = serde_cbor::to_vec(&trusted_light_block).unwrap();
+        let encoded_2 = serde_cbor::to_vec(&target_light_block).unwrap();
+
+        // Write the encoded light blocks to stdin.
+        let mut stdin = SP1Stdin::new();
+        stdin.write_vec(encoded_1);
+        stdin.write_vec(encoded_2);
+
+        stdin
     }
 
     /// Generate a proof of an update from trusted_light_block to target_light_block. Returns the

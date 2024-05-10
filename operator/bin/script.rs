@@ -1,6 +1,5 @@
 use clap::Parser;
-use sp1_sdk::{ProverClient, SP1Stdin};
-use tendermint_operator::{util::TendermintRPCClient, TENDERMINT_ELF};
+use tendermint_operator::TendermintProver;
 use tokio::runtime;
 
 #[derive(Parser, Debug)]
@@ -26,37 +25,28 @@ fn main() -> anyhow::Result<()> {
 
     let args = ScriptArgs::parse();
 
-    let prover_client = ProverClient::new();
-    let (pkey, vkey) = prover_client.setup(TENDERMINT_ELF);
+    let prover = TendermintProver::new();
 
     let rt = runtime::Runtime::new()?;
 
-    // Fetch the input light blocks.
-    let (trusted_light_block, target_light_block) = rt.block_on(async {
-        let tendermint_client = TendermintRPCClient::default();
-        tendermint_client
-            .get_light_blocks(args.trusted_block, args.target_block)
+    // Fetch the stdin for the proof.
+    let stdin = rt.block_on(async {
+        prover
+            .fetch_input_for_header_update_proof(args.trusted_block, args.target_block)
             .await
     });
 
-    // Encode the light blocks to be input into our program.
-    let encoded_1 = serde_cbor::to_vec(&trusted_light_block).unwrap();
-    let encoded_2 = serde_cbor::to_vec(&target_light_block).unwrap();
-
-    // Write the encoded light blocks to stdin.
-    let mut stdin = SP1Stdin::new();
-    stdin.write_vec(encoded_1);
-    stdin.write_vec(encoded_2);
-
     // Generate the proof. Depending on SP1_PROVER env, this may be a local or network proof.
-    let proof = prover_client
-        .prove_groth16(&pkey, stdin)
+    let proof = prover
+        .prover_client
+        .prove_groth16(&prover.pkey, stdin)
         .expect("proving failed");
     println!("Successfully generated proof!");
 
     // Verify proof.
-    prover_client
-        .verify_groth16(&proof, &vkey)
+    prover
+        .prover_client
+        .verify_groth16(&proof, &prover.vkey)
         .expect("Verification failed");
 
     Ok(())
