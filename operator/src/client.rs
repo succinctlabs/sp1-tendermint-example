@@ -32,7 +32,6 @@ impl Default for ContractClient {
     }
 }
 
-// TODO: Rewrite this.
 impl ContractClient {
     /// Creates a new `ContractClient`.
     pub fn new(chain_id: u64, rpc_url: &str, private_key: &str, contract: &str) -> Result<Self> {

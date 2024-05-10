@@ -35,18 +35,24 @@ impl TendermintProver {
         }
     }
 
-    /// Using the trusted_header_hash, fetch the latest block and generate a proof for that.
+    /// Fetch the trusted height from the trusted header hash and generate a proof from the trusted
+    /// block to the latest block.
     pub async fn generate_header_update_proof_to_latest_block(
         &self,
         trusted_header_hash: &[u8],
-    ) -> anyhow::Result<SP1Groth16Proof> {
+    ) -> SP1Groth16Proof {
         let tendermint_client = TendermintRPCClient::default();
         let latest_block_height = tendermint_client.get_latest_block_height().await;
+
         // Get the block height corresponding to the trusted header hash.
         let trusted_block_height = tendermint_client
             .get_block_height_from_hash(trusted_header_hash)
             .await;
-        self.generate_header_update_proof_between_blocks(trusted_block_height, latest_block_height)
+        let (trusted_light_block, target_light_block) = tendermint_client
+            .get_light_blocks(trusted_block_height, latest_block_height)
+            .await;
+
+        self.generate_header_update_proof(&trusted_light_block, &target_light_block)
             .await
     }
 
@@ -55,20 +61,13 @@ impl TendermintProver {
         &self,
         trusted_block_height: u64,
         target_block_height: u64,
-    ) -> anyhow::Result<SP1Groth16Proof> {
-        log::info!(
-            "Generating proof for blocks {} to {}",
-            trusted_block_height,
-            target_block_height
-        );
+    ) -> SP1Groth16Proof {
         let tendermint_client = TendermintRPCClient::default();
         let (trusted_light_block, target_light_block) = tendermint_client
             .get_light_blocks(trusted_block_height, target_block_height)
             .await;
-        let proof_data = self
-            .generate_header_update_proof(&trusted_light_block, &target_light_block)
-            .await;
-        Ok(proof_data)
+        self.generate_header_update_proof(&trusted_light_block, &target_light_block)
+            .await
     }
 
     /// Generate a proof of an update from trusted_light_block to target_light_block. Returns the
@@ -78,6 +77,11 @@ impl TendermintProver {
         trusted_light_block: &LightBlock,
         target_light_block: &LightBlock,
     ) -> SP1Groth16Proof {
+        log::info!(
+            "Generating proof for blocks {} to {}",
+            trusted_light_block.height(),
+            target_light_block.height()
+        );
         // Encode the light blocks to be input into our program.
         let encoded_1 = serde_cbor::to_vec(&trusted_light_block).unwrap();
         let encoded_2 = serde_cbor::to_vec(&target_light_block).unwrap();
@@ -87,13 +91,6 @@ impl TendermintProver {
         stdin.write_vec(encoded_1);
         stdin.write_vec(encoded_2);
 
-        // Generate proof.
-        self.generate_proof(stdin).await
-    }
-
-    // This function is used to generate a proof. Implementations of this trait can implement
-    // this method with either a local or network prover.
-    async fn generate_proof(&self, stdin: SP1Stdin) -> SP1Groth16Proof {
         // Generate the proof. Depending on SP1_PROVER env, this may be a local or network proof.
         let proof = self
             .prover_client
@@ -109,14 +106,4 @@ impl TendermintProver {
         // Return the proof.
         proof
     }
-}
-
-/// Utility method for converting u32 words to bytes in little endian.
-pub fn words_to_bytes_be(words: &[u32; 8]) -> [u8; 32] {
-    let mut bytes = [0u8; 32];
-    for i in 0..8 {
-        let word_bytes = words[i].to_be_bytes();
-        bytes[i * 4..(i + 1) * 4].copy_from_slice(&word_bytes);
-    }
-    bytes
 }
