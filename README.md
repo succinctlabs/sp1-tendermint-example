@@ -60,3 +60,12 @@ $ cd operator
 $ cargo run --bin operator
 ```
 
+## Run Script
+
+To generate a Tendermint proof and verify it run:
+
+```shell
+$ cd operator
+$ cargo run --bin script -- --trusted-block 2 --target-block 6
+```
+
