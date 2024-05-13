@@ -33,11 +33,12 @@ async fn main() -> anyhow::Result<()> {
     let prover = TendermintProver::new();
 
     // Generate a header update proof for the specified blocks.
-    let proof_data = prover
-        .generate_header_update_proof_between_blocks(args.trusted_block, args.target_block)
+    let (trusted_light_block, target_light_block) = prover
+        .fetch_light_blocks(args.trusted_block, args.target_block)
         .await;
+    let proof_data = prover.generate_tendermint_proof(&trusted_light_block, &target_light_block);
 
-    // Write the proof data to the file path.
+    // Save the proof data to the file path.
     let file_path = format!(
         "{}/fixture_{}:{}.json",
         args.fixture_path, args.trusted_block, args.target_block

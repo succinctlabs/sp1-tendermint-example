@@ -31,10 +31,16 @@ async fn main() -> anyhow::Result<()> {
         let latest_header_call_data = SP1Tendermint::latestHeaderCall {}.abi_encode();
         let trusted_header_hash = contract_client.read(latest_header_call_data).await?;
 
-        // Generate a header update proof to the latest block.
-        let proof_data = prover
-            .generate_header_update_proof_to_latest_block(&trusted_header_hash)
+        // Generate a header update proof from the trusted block to the latest block.
+        let trusted_block_height = prover
+            .get_block_height_from_hash(&trusted_header_hash)
             .await;
+        let latest_block_height = prover.fetch_latest_block_height().await;
+        let (trusted_light_block, target_light_block) = prover
+            .fetch_light_blocks(trusted_block_height, latest_block_height)
+            .await;
+        let proof_data =
+            prover.generate_tendermint_proof(&trusted_light_block, &target_light_block);
 
         // Relay the proof to the contract.
         let proof_as_bytes = proof_data.proof.encoded_proof.into_bytes();

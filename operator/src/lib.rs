@@ -37,72 +37,43 @@ impl TendermintProver {
 
     /// Fetch the trusted height from the trusted header hash and generate a proof from the trusted
     /// block to the latest block.
-    pub async fn generate_header_update_proof_to_latest_block(
-        &self,
-        trusted_header_hash: &[u8],
-    ) -> SP1Groth16Proof {
+    pub async fn get_block_height_from_hash(&self, trusted_header_hash: &[u8]) -> u64 {
         let tendermint_client = TendermintRPCClient::default();
-        let latest_block_height = tendermint_client.get_latest_block_height().await;
 
         // Get the block height corresponding to the trusted header hash.
-        let trusted_block_height = tendermint_client
+        tendermint_client
             .get_block_height_from_hash(trusted_header_hash)
-            .await;
-        let (trusted_light_block, target_light_block) = tendermint_client
-            .get_light_blocks(trusted_block_height, latest_block_height)
-            .await;
-
-        self.generate_header_update_proof(&trusted_light_block, &target_light_block)
             .await
     }
 
-    /// Given a trusted block height and a target block height, generate a proof of the update.
-    pub async fn generate_header_update_proof_between_blocks(
+    /// Fetch the trusted height from the trusted header hash and generate a proof from the trusted
+    /// block to the latest block.
+    pub async fn fetch_latest_block_height(&self) -> u64 {
+        let tendermint_client = TendermintRPCClient::default();
+
+        // Get the block height corresponding to the latest block.
+        tendermint_client.get_latest_block_height().await
+    }
+
+    /// Get the input for the header update proof from the trusted block to the latest block.
+    pub async fn fetch_light_blocks(
         &self,
         trusted_block_height: u64,
         target_block_height: u64,
-    ) -> SP1Groth16Proof {
+    ) -> (LightBlock, LightBlock) {
         let tendermint_client = TendermintRPCClient::default();
-        let (trusted_light_block, target_light_block) = tendermint_client
+        tendermint_client
             .get_light_blocks(trusted_block_height, target_block_height)
-            .await;
-        self.generate_header_update_proof(&trusted_light_block, &target_light_block)
             .await
     }
 
-    pub async fn fetch_input_for_header_update_proof(
-        &self,
-        trusted_block_height: u64,
-        target_block_height: u64,
-    ) -> SP1Stdin {
-        let tendermint_client = TendermintRPCClient::default();
-        let (trusted_light_block, target_light_block) = tendermint_client
-            .get_light_blocks(trusted_block_height, target_block_height)
-            .await;
-        // Encode the light blocks to be input into our program.
-        let encoded_1 = serde_cbor::to_vec(&trusted_light_block).unwrap();
-        let encoded_2 = serde_cbor::to_vec(&target_light_block).unwrap();
-
-        // Write the encoded light blocks to stdin.
-        let mut stdin = SP1Stdin::new();
-        stdin.write_vec(encoded_1);
-        stdin.write_vec(encoded_2);
-
-        stdin
-    }
-
-    /// Generate a proof of an update from trusted_light_block to target_light_block. Returns the
-    /// public values and proof of the update.
-    pub async fn generate_header_update_proof(
+    /// Generate a proof of an update from trusted_light_block to target_light_block. Returns an
+    /// SP1Groth16Proof.
+    pub fn generate_tendermint_proof(
         &self,
         trusted_light_block: &LightBlock,
         target_light_block: &LightBlock,
     ) -> SP1Groth16Proof {
-        log::info!(
-            "Generating proof for blocks {} to {}",
-            trusted_light_block.height(),
-            target_light_block.height()
-        );
         // Encode the light blocks to be input into our program.
         let encoded_1 = serde_cbor::to_vec(&trusted_light_block).unwrap();
         let encoded_2 = serde_cbor::to_vec(&target_light_block).unwrap();
@@ -112,7 +83,7 @@ impl TendermintProver {
         stdin.write_vec(encoded_1);
         stdin.write_vec(encoded_2);
 
-        // Generate the proof. Depending on SP1_PROVER env, this may be a local or network proof.
+        // Generate the proof. Depending on SP1_PROVER env variable, this may be a mock, local or network proof.
         let proof = self
             .prover_client
             .prove_groth16(&self.pkey, stdin)
