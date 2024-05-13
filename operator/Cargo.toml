@@ -16,8 +16,8 @@ name = "vkey"
 path = "bin/vkey.rs"
 
 [[bin]]
-name = "script"
-path = "bin/script.rs"
+name = "test"
+path = "bin/test.rs"
 
 [dependencies]
 alloy = { git = "https://github.com/alloy-rs/alloy", features = ["sol-types"] }

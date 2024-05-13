@@ -18,7 +18,7 @@ struct ScriptArgs {
 /// Generate a proof between the given trusted and target blocks.
 /// Example:
 /// ```
-/// RUST_LOG=info cargo run --bin script --release -- --trusted-block=<TRUSTED_BLOCK> --target-block=<TARGET_BLOCK>
+/// RUST_LOG=info cargo run --bin test --release -- --trusted-block=<TRUSTED_BLOCK> --target-block=<TARGET_BLOCK>
 /// ```
 // TODO: When https://github.com/succinctlabs/sp1/pull/687 is merged, we can make this an async
 // program as block_in_place will handle prove_groth16.
