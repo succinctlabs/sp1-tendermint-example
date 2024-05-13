@@ -1,4 +1,5 @@
 use clap::Parser;
+use log::info;
 use tendermint_operator::TendermintProver;
 use tokio::runtime;
 
@@ -46,6 +47,8 @@ fn main() -> anyhow::Result<()> {
         .prover_client
         .verify_groth16(&proof, &prover.vkey)
         .expect("Verification failed");
+
+    info!("Successfully generated proof!");
 
     Ok(())
 }
