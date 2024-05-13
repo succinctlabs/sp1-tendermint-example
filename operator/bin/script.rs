@@ -20,7 +20,7 @@ struct ScriptArgs {
 /// RUST_LOG=info cargo run --bin script --release -- --trusted-block=1 --target-block=5
 /// ```
 // TODO: When https://github.com/succinctlabs/sp1/pull/687 is merged, we can make this an async
-// script as block_in_place will handle prove_groth16.
+// program as block_in_place will handle prove_groth16.
 fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
     sp1_sdk::utils::setup_logger();
