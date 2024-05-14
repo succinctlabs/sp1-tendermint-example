@@ -60,3 +60,12 @@ $ cd operator
 $ cargo run --bin operator
 ```
 
+## Run Script
+
+To test that your Tendermint program is working correctly, set `SP1_PROVER=mock` to use a mock prover, and then run the test script. If this executes successfully, you will see a message like `Successfully generated proof!`.
+
+```shell
+$ cd operator
+$ RUST_LOG=info cargo run --bin test --release -- --trusted-block <TRUSTED_BLOCK> --target-block <TARGET_BLOCK>
+```
+

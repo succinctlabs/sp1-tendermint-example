@@ -1,5 +1,4 @@
 use clap::Parser;
-use std::fs;
 use tendermint_operator::TendermintProver;
 
 #[derive(Parser, Debug)]
@@ -31,26 +30,20 @@ async fn main() -> anyhow::Result<()> {
 
     let args = FixtureArgs::parse();
 
-    // std::env::set_var("SP1_PROVER", "mock");
     let prover = TendermintProver::new();
 
     // Generate a header update proof for the specified blocks.
-    let proof_data = prover
-        .generate_header_update_proof_between_blocks(args.trusted_block, args.target_block)
+    let (trusted_light_block, target_light_block) = prover
+        .fetch_light_blocks(args.trusted_block, args.target_block)
         .await;
+    let proof_data = prover.generate_tendermint_proof(&trusted_light_block, &target_light_block);
 
-    if let Ok(proof_data) = proof_data {
-        // Write the proof data to JSON.
-        let proof_data_json = serde_json::to_string(&proof_data)?;
-
-        let file_path = format!(
-            "{}/fixture_{}:{}.json",
-            args.fixture_path, args.trusted_block, args.target_block
-        );
-
-        // Write the proof data to the fixture path.
-        fs::write(file_path, proof_data_json)?;
-    }
+    // Save the proof data to the file path.
+    let file_path = format!(
+        "{}/fixture_{}:{}.json",
+        args.fixture_path, args.trusted_block, args.target_block
+    );
+    proof_data.save(file_path)?;
 
     Ok(())
 }

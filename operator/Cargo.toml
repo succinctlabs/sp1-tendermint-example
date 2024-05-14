@@ -15,10 +15,14 @@ path = "bin/fixture.rs"
 name = "vkey"
 path = "bin/vkey.rs"
 
+[[bin]]
+name = "test"
+path = "bin/test.rs"
+
 [dependencies]
 alloy = { git = "https://github.com/alloy-rs/alloy", features = ["sol-types"] }
-sp1-sdk = { git = "https://github.com/succinctlabs/sp1.git" }
-sp1-prover = { git = "https://github.com/succinctlabs/sp1.git" }
+sp1-sdk = { git = "https://github.com/succinctlabs/sp1.git", rev = "v1.0.0-testnet" }
+sp1-prover = { git = "https://github.com/succinctlabs/sp1.git", rev = "v1.0.0-testnet" }
 reqwest = { version = "0.11", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
@@ -40,4 +44,4 @@ log = "0.4.21"
 async-trait = "0.1.80"
 hex = "0.4.3"
 [build-dependencies]
-sp1-helper = { git = "https://github.com/succinctlabs/sp1.git", rev = "277f1b4cfee5129bd40d74748f3d241cdfa56e63" }
+sp1-helper = { git = "https://github.com/succinctlabs/sp1.git", rev = "v1.0.0-testnet" }
