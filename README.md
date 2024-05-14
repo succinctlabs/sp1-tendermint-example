@@ -66,6 +66,6 @@ To test that your Tendermint program is working correctly, set `SP1_PROVER=mock`
 
 ```shell
 $ cd operator
-$ RUST_LOG=info cargo run --bin test -- --trusted-block <TRUSTED_BLOCK> --target-block <TARGET_BLOCK>
+$ RUST_LOG=info cargo run --bin test --release -- --trusted-block <TRUSTED_BLOCK> --target-block <TARGET_BLOCK>
 ```
 
