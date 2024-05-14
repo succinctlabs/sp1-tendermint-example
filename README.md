@@ -10,6 +10,15 @@ The SP1 Tendermint template is a simple example of a Tendermint light client on 
 * The `program` directory contains a Succinct zkVM program that implements Tendermint light client verification logic.
 * The `operator` directory contains a Rust program that interacts with the Solidity contract to run in a loop, fetch the latest header and generate a proof of the update, and then updates the contract with the proof. It also contains several scripts to help with testing and deployment.
 
+## Test Program
+
+To test that your Tendermint program is working correctly, set `SP1_PROVER=mock` to use a mock prover, and then run the test script. If this executes successfully, you will see a message like `Successfully generated proof!`.
+
+```shell
+$ cd operator
+$ RUST_LOG=info cargo run --bin test --release -- --trusted-block <TRUSTED_BLOCK> --target-block <TARGET_BLOCK>
+```
+
 ## End to end deployment
 
 * Follow instructions to install [SP1](https://succinctlabs.github.io/sp1/).
@@ -58,14 +67,5 @@ CHAIN_ID=<chain_id> RPC_URL=<rpc_url> PRIVATE_KEY=<private_key> cargo run --bin 
 ```shell
 $ cd operator
 $ cargo run --bin operator
-```
-
-## Run Script
-
-To test that your Tendermint program is working correctly, set `SP1_PROVER=mock` to use a mock prover, and then run the test script. If this executes successfully, you will see a message like `Successfully generated proof!`.
-
-```shell
-$ cd operator
-$ RUST_LOG=info cargo run --bin test --release -- --trusted-block <TRUSTED_BLOCK> --target-block <TARGET_BLOCK>
 ```
 
