@@ -1,4 +1,6 @@
+use alloy_sol_types::{sol, SolType};
 use clap::Parser;
+use serde::{Deserialize, Serialize};
 use tendermint_operator::TendermintProver;
 
 #[derive(Parser, Debug)]
@@ -15,6 +17,19 @@ struct FixtureArgs {
     /// Fixture path.
     #[clap(long, default_value = "../contracts/fixtures")]
     fixture_path: String,
+}
+
+type TendermintProofTuple = sol! {
+    tuple(bytes32, bytes32, bytes32)
+};
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+struct TendermintFixture {
+    trusted_header_hash: Vec<u8>,
+    target_header_hash: Vec<u8>,
+    vkey: String,
+    public_values: String,
+    proof: String,
 }
 
 /// Writes the proof data for the given trusted and target blocks to the given fixture path.
@@ -38,6 +53,9 @@ async fn main() -> anyhow::Result<()> {
         .await;
     let proof_data = prover.generate_tendermint_proof(&trusted_light_block, &target_light_block);
 
+    let bytes = proof_data.public_values.as_slice();
+    let (trusted_header_hash, target_header_hash) =
+        TendermintProofTuple::abi_decode(bytes, false).unwrap();
     // Save the proof data to the file path.
     let file_path = format!(
         "{}/fixture_{}:{}.json",
