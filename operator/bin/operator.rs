@@ -1,4 +1,4 @@
-use alloy::{sol, sol_types::SolCall};
+use alloy_sol_types::{sol, SolCall};
 use std::time::Duration;
 use tendermint_operator::{contract::ContractClient, TendermintProver};
 

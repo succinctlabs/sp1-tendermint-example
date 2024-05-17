@@ -1,6 +1,8 @@
 use alloy_sol_types::{sol, SolType};
 use clap::Parser;
 use serde::{Deserialize, Serialize};
+use sp1_sdk::HashableKey;
+use std::path::PathBuf;
 use tendermint_operator::TendermintProver;
 
 #[derive(Parser, Debug)]
@@ -20,7 +22,7 @@ struct FixtureArgs {
 }
 
 type TendermintProofTuple = sol! {
-    tuple(bytes32, bytes32, bytes32)
+    tuple(bytes32, bytes32)
 };
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -56,12 +58,22 @@ async fn main() -> anyhow::Result<()> {
     let bytes = proof_data.public_values.as_slice();
     let (trusted_header_hash, target_header_hash) =
         TendermintProofTuple::abi_decode(bytes, false).unwrap();
+
+    let fixture = TendermintFixture {
+        trusted_header_hash: trusted_header_hash.to_vec(),
+        target_header_hash: target_header_hash.to_vec(),
+        vkey: prover.vkey.bytes32().to_string(),
+        public_values: proof_data.public_values.bytes(),
+        proof: proof_data.bytes().to_string(),
+    };
+
     // Save the proof data to the file path.
-    let file_path = format!(
-        "{}/fixture_{}:{}.json",
-        args.fixture_path, args.trusted_block, args.target_block
-    );
-    proof_data.save(file_path)?;
+    let fixture_path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(args.fixture_path);
+    std::fs::write(
+        fixture_path.join("fixture.json"),
+        serde_json::to_string_pretty(&fixture).unwrap(),
+    )
+    .unwrap();
 
     Ok(())
 }
