@@ -6,9 +6,9 @@ sol! {
     contract SP1Tendermint {
         bytes32 public latestHeader;
 
-        function updateHeader(
-            bytes calldata publicValues,
-            bytes calldata proof
+        function verifyTendermintProof(
+            bytes calldata proof,
+            bytes calldata publicValues
         ) public;
     }
 }
@@ -44,13 +44,15 @@ async fn main() -> anyhow::Result<()> {
 
         // Relay the proof to the contract.
         let proof_as_bytes = proof_data.proof.encoded_proof.into_bytes();
-        let update_header_call_data = SP1Tendermint::updateHeaderCall {
+        let verify_tendermint_proof_call_data = SP1Tendermint::verifyTendermintProofCall {
             publicValues: proof_data.public_values.to_vec().into(),
             proof: proof_as_bytes.into(),
         }
         .abi_encode();
 
-        contract_client.send(update_header_call_data).await?;
+        contract_client
+            .send(verify_tendermint_proof_call_data)
+            .await?;
 
         // Sleep for 10 seconds.
         println!("sleeping for 10 seconds");

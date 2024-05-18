@@ -1,6 +1,5 @@
 use clap::Parser;
 use log::info;
-use std::env;
 use tendermint_operator::TendermintProver;
 use tokio::runtime;
 
