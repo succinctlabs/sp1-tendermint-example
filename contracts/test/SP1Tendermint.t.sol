@@ -2,48 +2,56 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "forge-std/Test.sol";
+import {stdJson} from "forge-std/StdJson.sol";
 import {SP1Tendermint} from "../src/SP1Tendermint.sol";
 import {SP1Verifier} from "../src/SP1Verifier.sol";
 
+struct SP1TendermintFixtureJson {
+    bytes32 trustedHeaderHash;
+    bytes32 targetHeaderHash;
+    bytes32 vkey;
+    bytes publicValues;
+    bytes proof;
+}
+
 contract SP1TendermintTest is Test {
-    SP1Verifier public verifier;
-    bytes32 public programHash;
+    using stdJson for string;
+
+    SP1Tendermint public tendermint;
 
     function setUp() public {
-        verifier = new SP1Verifier();
-        programHash = bytes32(0);
+        SP1TendermintFixtureJson memory fixture = loadFixture();
+        tendermint = new SP1Tendermint(fixture.vkey, fixture.trustedHeaderHash);
     }
 
-    // Helper function to bytes32 from bytes memory (useful for reading 32 bytes from pv).
-    function readBytes(
-        bytes calldata bs,
-        uint256 start,
-        uint256 end
-    ) public pure returns (bytes memory) {
-        return bs[start:end];
+    function loadFixture()
+        public
+        view
+        returns (SP1TendermintFixtureJson memory)
+    {
+        string memory root = vm.projectRoot();
+        string memory path = string.concat(root, "/fixtures/fixture.json");
+        string memory json = vm.readFile(path);
+        bytes memory jsonBytes = json.parseRaw(".");
+        return abi.decode(jsonBytes, (SP1TendermintFixtureJson));
     }
 
-    // Read from fixture.
-    function test_fixtureTest() public {
-        // Parse JSON {pv, proof} from fixture as bytes.
-        string memory fixture = vm.readFile("./fixtures/fixture_1:5.json");
-        (bytes memory pv, bytes memory proof) = abi.decode(
-            vm.parseJson(fixture),
-            (bytes, bytes)
+    function test_ValidTendermint() public {
+        SP1TendermintFixtureJson memory fixture = loadFixture();
+
+        tendermint.verifyTendermintProof(fixture.proof, fixture.publicValues);
+
+        assert(tendermint.latestHeader() == fixture.targetHeaderHash);
+    }
+
+    function testFail_InvalidTendermint() public {
+        SP1TendermintFixtureJson memory fixture = loadFixture();
+
+        tendermint.verifyTendermintProof(
+            fixture.publicValues,
+            fixture.publicValues
         );
 
-        // First 32 bytes of the public values of the pv are the trusted block hash.
-        // Read 32 bytes from pv.
-        bytes32 trustedBlockHash = bytes32(this.readBytes(pv, 0, 32));
-
-        // Initialize SP1Tendermint with program hash, verifier and the trusted block hash.
-        SP1Tendermint sp1 = new SP1Tendermint(
-            programHash,
-            address(verifier),
-            trustedBlockHash
-        );
-
-        // Update SP1Tendermint using the proof from the fixture.
-        sp1.updateHeader(pv, proof);
+        assert(tendermint.latestHeader() == fixture.targetHeaderHash);
     }
 }
