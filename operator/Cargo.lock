@@ -5296,7 +5296,7 @@ dependencies = [
 [[package]]
 name = "sp1-helper"
 version = "0.1.0"
-source = "git+https://github.com/succinctlabs/sp1.git?branch=main#9d41254c7f81de3aef5953c841cf2a512057b4f3"
+source = "git+https://github.com/succinctlabs/sp1.git?tag=v1.0.0-testnet#e721b246243e40376f7b75d7330e53c7351b727f"
 dependencies = [
  "cargo_metadata",
  "chrono",
