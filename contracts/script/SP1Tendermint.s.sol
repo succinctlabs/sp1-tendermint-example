@@ -1,34 +1,44 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+// // SPDX-License-Identifier: UNLICENSED
+// pragma solidity ^0.8.13;
 
-import {Script, console} from "forge-std/Script.sol";
-import {SP1Verifier} from "../src/SP1Verifier.sol";
-import {SP1Tendermint} from "../src/SP1Tendermint.sol";
+// import {Script, console} from "forge-std/Script.sol";
+// import {stdJson} from "forge-std/StdJson.sol";
+// import {SP1Verifier} from "../src/SP1Verifier.sol";
+// import {SP1Tendermint} from "../src/SP1Tendermint.sol";
 
-contract SP1TendermintScript is Script {
-    function setUp() public {}
+// struct SP1TendermintFixtureJson {
+//     bytes32 trustedHeaderHash;
+//     bytes32 targetHeaderHash;
+//     bytes32 vkey;
+//     bytes publicValues;
+//     bytes proof;
+// }
 
-    function run() public returns (address) {
-        vm.startBroadcast();
+// contract SP1TendermintScript is Script {
+//     function setUp() public {}
 
-        // Deploy SP1Verifier.
-        SP1Verifier verifier = new SP1Verifier();
-        address verifierAddress = address(verifier);
+//     function loadFixture()
+//         public
+//         view
+//         returns (SP1TendermintFixtureJson memory)
+//     {
+//         string memory root = vm.projectRoot();
+//         string memory path = string.concat(root, "/fixtures/fixture.json");
+//         string memory json = vm.readFile(path);
+//         bytes memory jsonBytes = json.parseRaw(".");
+//         return abi.decode(jsonBytes, (SP1TendermintFixtureJson));
+//     }
 
-        // TODO: Generate the inputs from "cargo build". Output "trustedBlockHash" and "programHash" to a JSON which this script can read.
-        bytes32 trustedBlockHash = bytes32(
-            0x1BAACA085AFB1BFC68B5F58323DAD95B7D3F7BFC5368B13418E6ECD542E058BD
-        );
-        bytes32 programHash = bytes32(
-            0xa718c92600de3c1afc00095cdc079d71a6625d09f789e139153ea40d623e0964
-        );
+//     function run() public returns (address) {
+//         vm.startBroadcast();
 
-        // Deploy SP1Tendermint.
-        SP1Tendermint sp1 = new SP1Tendermint(
-            programHash,
-            address(verifierAddress),
-            trustedBlockHash
-        );
-        return address(sp1);
-    }
-}
+//         SP1TendermintFixtureJson memory fixture = loadFixture();
+
+//         // Deploy SP1Tendermint.
+//         SP1Tendermint sp1 = new SP1Tendermint(
+//             fixture.vkey,
+//             fixture.trustedHeaderHash
+//         );
+//         return address(sp1);
+//     }
+// }

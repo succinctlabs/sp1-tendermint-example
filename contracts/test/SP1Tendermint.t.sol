@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Test, console} from "forge-std/Test.sol";
+import "forge-std/console.sol";
+import {Test} from "forge-std/Test.sol";
 import {stdJson} from "forge-std/StdJson.sol";
 import {SP1Tendermint} from "../src/SP1Tendermint.sol";
 import {SP1Verifier} from "../src/SP1Verifier.sol";
@@ -21,6 +22,11 @@ contract SP1TendermintTest is Test {
 
     function setUp() public {
         SP1TendermintFixtureJson memory fixture = loadFixture();
+        console.log("Challenge: %s", string(abi.encodePacked(fixture.vkey)));
+        console.log(
+            "Trusted Header Hash: %s",
+            string(abi.encodePacked(fixture.trustedHeaderHash))
+        );
         tendermint = new SP1Tendermint(fixture.vkey, fixture.trustedHeaderHash);
     }
 

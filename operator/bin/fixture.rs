@@ -60,8 +60,8 @@ async fn main() -> anyhow::Result<()> {
         TendermintProofTuple::abi_decode(bytes, false).unwrap();
 
     let fixture = TendermintFixture {
-        trusted_header_hash: trusted_header_hash.to_vec(),
-        target_header_hash: target_header_hash.to_vec(),
+        trusted_header_hash: hex::encode(trusted_header_hash).into(),
+        target_header_hash: hex::encode(target_header_hash).into(),
         vkey: prover.vkey.bytes32().to_string(),
         public_values: proof_data.public_values.bytes(),
         proof: proof_data.bytes().to_string(),
