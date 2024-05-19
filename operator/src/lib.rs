@@ -2,6 +2,7 @@
 use crate::util::TendermintRPCClient;
 use sp1_sdk::{ProverClient, SP1Groth16Proof, SP1ProvingKey, SP1Stdin, SP1VerifyingKey};
 use tendermint_light_client_verifier::types::LightBlock;
+use tokio::runtime;
 
 pub mod contract;
 mod types;
@@ -82,6 +83,10 @@ impl TendermintProver {
         let mut stdin = SP1Stdin::new();
         stdin.write_vec(encoded_1);
         stdin.write_vec(encoded_2);
+
+        if let Ok(handle) = runtime::Handle::try_current() {
+            println!("{:?}", "Got tokio handle");
+        }
 
         // Generate the proof. Depending on SP1_PROVER env variable, this may be a mock, local or network proof.
         let proof = self

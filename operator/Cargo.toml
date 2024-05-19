@@ -20,8 +20,8 @@ name = "test"
 path = "bin/test.rs"
 
 [dependencies]
-sp1-sdk = { git = "https://github.com/succinctlabs/sp1.git", tag = "v1.0.0-testnet" }
-sp1-prover = { git = "https://github.com/succinctlabs/sp1.git", tag = "v1.0.0-testnet" }
+sp1-sdk = { git = "https://github.com/succinctlabs/sp1.git", branch = "dev" }
+sp1-prover = { git = "https://github.com/succinctlabs/sp1.git", branch = "dev" }
 reqwest = { version = "0.11", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
@@ -44,4 +44,4 @@ log = "0.4.21"
 async-trait = "0.1.80"
 hex = "0.4.3"
 [build-dependencies]
-sp1-helper = { git = "https://github.com/succinctlabs/sp1.git", tag = "v1.0.0-testnet" }
+sp1-helper = { git = "https://github.com/succinctlabs/sp1.git", branch = "dev" }
