@@ -12,6 +12,10 @@ name = "fixture"
 path = "bin/fixture.rs"
 
 [[bin]]
+name = "fixture_test"
+path = "bin/fixture_test.rs"
+
+[[bin]]
 name = "vkey"
 path = "bin/vkey.rs"
 

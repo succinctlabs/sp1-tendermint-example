@@ -1,21 +1,13 @@
 use alloy_sol_types::{sol, SolType};
 use clap::Parser;
 use serde::{Deserialize, Serialize};
-use sp1_sdk::HashableKey;
+use sp1_sdk::{HashableKey, ProverClient};
 use std::path::PathBuf;
 use tendermint_operator::TendermintProver;
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct FixtureArgs {
-    /// Trusted block.
-    #[clap(long)]
-    trusted_block: u64,
-
-    /// Target block.
-    #[clap(long, env)]
-    target_block: u64,
-
     /// Fixture path.
     #[clap(long, default_value = "../contracts/fixtures")]
     fixture_path: String,
@@ -49,35 +41,16 @@ fn main() -> anyhow::Result<()> {
 
     let prover = TendermintProver::new();
 
-    let runtime = tokio::runtime::Runtime::new().unwrap();
-    let (trusted_light_block, target_light_block) = runtime.block_on(async {
-        prover
-            .fetch_light_blocks(args.trusted_block, args.target_block)
-            .await
-    });
-    // Generate a header update proof for the specified blocks.
-
-    let proof_data = prover.generate_tendermint_proof(&trusted_light_block, &target_light_block);
-
-    let bytes = proof_data.public_values.as_slice();
-    let (trusted_header_hash, target_header_hash) =
-        TendermintProofTuple::abi_decode(bytes, false).unwrap();
-
-    let fixture = TendermintFixture {
-        trusted_header_hash: hex::encode(trusted_header_hash),
-        target_header_hash: hex::encode(target_header_hash),
-        vkey: prover.vkey.bytes32(),
-        public_values: proof_data.public_values.bytes(),
-        proof: proof_data.bytes(),
-    };
-
     // Save the proof data to the file path.
     let fixture_path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(args.fixture_path);
-    std::fs::write(
-        fixture_path.join("fixture.json"),
-        serde_json::to_string_pretty(&fixture).unwrap(),
-    )
-    .unwrap();
+
+    let contents = std::fs::read_to_string(fixture_path.join("fixture.json")).unwrap();
+    let fixture: TendermintFixture = serde_json::from_str(&contents).unwrap();
+
+    // let prover_client = ProverClient::new();
+    // prover_client
+    //     .verify_groth16(&fixture.proof, &fixture.vkey)
+    //     .expect("Verification failed");
 
     Ok(())
 }
