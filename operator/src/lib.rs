@@ -84,10 +84,6 @@ impl TendermintProver {
         stdin.write_vec(encoded_1);
         stdin.write_vec(encoded_2);
 
-        if let Ok(handle) = runtime::Handle::try_current() {
-            println!("{:?}", "Got tokio handle");
-        }
-
         // Generate the proof. Depending on SP1_PROVER env variable, this may be a mock, local or network proof.
         let proof = self
             .prover_client

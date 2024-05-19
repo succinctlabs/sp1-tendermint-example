@@ -41,8 +41,7 @@ struct TendermintFixture {
 /// RUST_LOG=info cargo run --bin fixture --release -- --trusted-block=1 --target-block=5
 /// ```
 /// The fixture will be written to the path: ./contracts/fixtures/fixture_1:5.json
-#[tokio::main]
-async fn main() -> anyhow::Result<()> {
+fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
     sp1_sdk::utils::setup_logger();
 
@@ -50,10 +49,14 @@ async fn main() -> anyhow::Result<()> {
 
     let prover = TendermintProver::new();
 
+    let runtime = tokio::runtime::Runtime::new().unwrap();
+    let (trusted_light_block, target_light_block) = runtime.block_on(async {
+        prover
+            .fetch_light_blocks(args.trusted_block, args.target_block)
+            .await
+    });
     // Generate a header update proof for the specified blocks.
-    let (trusted_light_block, target_light_block) = prover
-        .fetch_light_blocks(args.trusted_block, args.target_block)
-        .await;
+
     let proof_data = prover.generate_tendermint_proof(&trusted_light_block, &target_light_block);
 
     let bytes = proof_data.public_values.as_slice();
