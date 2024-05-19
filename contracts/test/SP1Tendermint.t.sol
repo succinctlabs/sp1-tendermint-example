@@ -63,10 +63,11 @@ contract SP1TendermintTest is Test {
     function testFail_InvalidTendermint() public {
         SP1TendermintFixtureJson memory fixture = loadFixture();
 
-        tendermint.verifyTendermintProof(
-            fixture.publicValues,
-            fixture.publicValues
-        );
+        // Create a fake proof.
+        bytes memory fakeProof = new bytes(fixture.proof.length);
+
+        // Create fixture of the length of the proof bytes.
+        tendermint.verifyTendermintProof(fakeProof, fixture.publicValues);
 
         assert(tendermint.latestHeader() == fixture.targetHeaderHash);
     }

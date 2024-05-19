@@ -7,6 +7,8 @@ contract SP1Tendermint is SP1Verifier {
     bytes32 public tendermintProgramVkey;
     bytes32 public latestHeader;
 
+    error InvalidTrustedHeader();
+
     constructor(bytes32 _tendermintProgramVkey, bytes32 _initialBlockHash) {
         tendermintProgramVkey = _tendermintProgramVkey;
         latestHeader = _initialBlockHash;
@@ -22,7 +24,7 @@ contract SP1Tendermint is SP1Verifier {
         );
 
         if (trustedHeaderHash != latestHeader) {
-            revert("Trusted block hash and public values do not match");
+            revert InvalidTrustedHeader();
         }
 
         // Verify the proof with the associated public values. This will revert if proof invalid.

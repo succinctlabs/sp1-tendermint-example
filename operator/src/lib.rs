@@ -1,8 +1,6 @@
-// TODO: import from sp1_sdk when these are public in the future
 use crate::util::TendermintRPCClient;
 use sp1_sdk::{ProverClient, SP1Groth16Proof, SP1ProvingKey, SP1Stdin, SP1VerifyingKey};
 use tendermint_light_client_verifier::types::LightBlock;
-use tokio::runtime;
 
 pub mod contract;
 mod types;
