@@ -8,11 +8,11 @@ The SP1 Tendermint template is a simple example of a Tendermint light client on 
 
 * The `contracts` directory contains a Solidity contract that implements the Tendermint light client.
 * The `program` directory contains a Succinct zkVM program that implements Tendermint light client verification logic.
-* The `operator` directory contains a Rust program that interacts with the Solidity contract to run in a loop, fetch the latest header and generate a proof of the update, and then updates the contract with the proof. It also contains several scripts to help with testing and deployment.
+* The `operator` directory contains a Rust program that interacts with the Solidity contract. It fetches the latest header and generates a proof of the update, and then updates the contract with the proof. It also contains several scripts to help with testing and deployment of the contract.
 
 ## Test Program
 
-To test that your Tendermint program is working correctly, set `SP1_PROVER=mock` to use a mock prover, and then run the test script. If this executes successfully, you will see a message like `Successfully generated proof!`.
+To test that your Tendermint program is working correctly, set `SP1_PROVER=mock` to use a mock prover, and then run the test script in the operator folder. If this executes successfully, you will see a message like `Successfully generated proof!`.
 
 ```shell
 $ cd operator

@@ -54,8 +54,8 @@ async fn main() -> anyhow::Result<()> {
             .send(verify_tendermint_proof_call_data)
             .await?;
 
-        // Sleep for 10 seconds.
-        println!("sleeping for 10 seconds");
-        tokio::time::sleep(Duration::from_secs(10)).await;
+        // Sleep for 60 seconds.
+        println!("sleeping for 60 seconds");
+        tokio::time::sleep(Duration::from_secs(60)).await;
     }
 }
