@@ -50,10 +50,6 @@ contract SP1TendermintTest is Test {
         });
 
         return fixture;
-
-        // console.logBytes(trustedHeaderHash);
-        // bytes memory jsonBytes = json.readA(".");
-        // return abi.decode(jsonBytes, (SP1TendermintFixtureJson));
     }
 
     function test_ValidTendermint() public {
