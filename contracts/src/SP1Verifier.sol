@@ -681,6 +681,7 @@ contract Verifier {
     }
 }
 
+
 /// @title SP1 Verifier
 /// @author Succinct Labs
 /// @notice This contracts implements a solidity verifier for SP1.
@@ -772,3 +773,4 @@ contract SP1Verifier is Verifier {
         this.verifyProof(proof, commitments, commitmentPok, inputs);
     }
 }
+
