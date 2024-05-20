@@ -1,34 +1,60 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Script, console} from "forge-std/Script.sol";
-import {SP1Verifier} from "../src/SP1Verifier.sol";
+import "forge-std/console.sol";
+import {Script} from "forge-std/Script.sol";
+import {stdJson} from "forge-std/StdJson.sol";
 import {SP1Tendermint} from "../src/SP1Tendermint.sol";
+import {SP1Verifier} from "../src/SP1Verifier.sol";
+
+struct SP1TendermintFixtureJson {
+    bytes32 trustedHeaderHash;
+    bytes32 targetHeaderHash;
+    bytes32 vkey;
+    bytes publicValues;
+    bytes proof;
+}
 
 contract SP1TendermintScript is Script {
-    function setUp() public {}
+    using stdJson for string;
+
+    SP1Tendermint public tendermint;
+
+    function setUp() public {
+        SP1TendermintFixtureJson memory fixture = loadFixture();
+        console.logBytes32(fixture.vkey);
+        console.logBytes32(fixture.trustedHeaderHash);
+        tendermint = new SP1Tendermint(fixture.vkey, fixture.trustedHeaderHash);
+    }
+
+    function loadFixture()
+        public
+        view
+        returns (SP1TendermintFixtureJson memory)
+    {
+        string memory root = vm.projectRoot();
+        string memory path = string.concat(root, "/fixtures/fixture.json");
+        string memory json = vm.readFile(path);
+        bytes32 trustedHeaderHash = json.readBytes32(".trustedHeaderHash");
+        bytes32 targetHeaderHash = json.readBytes32(".targetHeaderHash");
+        bytes32 vkey = json.readBytes32(".vkey");
+        bytes memory publicValues = json.readBytes(".publicValues");
+        bytes memory proof = json.readBytes(".proof");
+
+        SP1TendermintFixtureJson memory fixture = SP1TendermintFixtureJson({
+            trustedHeaderHash: trustedHeaderHash,
+            targetHeaderHash: targetHeaderHash,
+            vkey: vkey,
+            publicValues: publicValues,
+            proof: proof
+        });
+
+        return fixture;
+    }
 
     function run() public returns (address) {
         vm.startBroadcast();
 
-        // Deploy SP1Verifier.
-        SP1Verifier verifier = new SP1Verifier();
-        address verifierAddress = address(verifier);
-
-        // TODO: Generate the inputs from "cargo build". Output "trustedBlockHash" and "programHash" to a JSON which this script can read.
-        bytes32 trustedBlockHash = bytes32(
-            0x1BAACA085AFB1BFC68B5F58323DAD95B7D3F7BFC5368B13418E6ECD542E058BD
-        );
-        bytes32 programHash = bytes32(
-            0xa718c92600de3c1afc00095cdc079d71a6625d09f789e139153ea40d623e0964
-        );
-
-        // Deploy SP1Tendermint.
-        SP1Tendermint sp1 = new SP1Tendermint(
-            programHash,
-            address(verifierAddress),
-            trustedBlockHash
-        );
-        return address(sp1);
+        return address(tendermint);
     }
 }

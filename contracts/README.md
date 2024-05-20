@@ -1,3 +1,11 @@
+## Testing
+Once you've added a fixture to `fixtures/fixture.json`, you can run tests with:
+
+```shell
+forge test -vvv
+```
+
+
 ### Deploy
 
 ```shell

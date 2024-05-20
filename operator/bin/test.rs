@@ -1,6 +1,5 @@
 use clap::Parser;
 use log::info;
-use std::env;
 use tendermint_operator::TendermintProver;
 use tokio::runtime;
 
@@ -30,7 +29,6 @@ fn main() -> anyhow::Result<()> {
     let args = ScriptArgs::parse();
 
     // Set the prover to mock mode. This is useful for testing the program.
-    env::set_var("SP1_PROVER", "mock");
     let prover = TendermintProver::new();
 
     let rt = runtime::Runtime::new()?;

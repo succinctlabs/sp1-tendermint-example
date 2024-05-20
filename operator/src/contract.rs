@@ -67,11 +67,7 @@ impl ContractClient {
             .from(self.client.address())
             .data(calldata);
 
-        println!("Transaction request: {:?}", &tx);
-
         let tx = self.client.send_transaction(tx, None).await?.await?;
-
-        println!("Transaction receipt: {:?}", &tx);
 
         Ok(tx)
     }
