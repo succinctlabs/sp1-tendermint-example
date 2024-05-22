@@ -20,40 +20,15 @@ contract SP1TendermintScript is Script {
 
     SP1Tendermint public tendermint;
 
-    function setUp() public {
-        SP1TendermintFixtureJson memory fixture = loadFixture();
-        console.logBytes32(fixture.vkey);
-        console.logBytes32(fixture.trustedHeaderHash);
-        tendermint = new SP1Tendermint(fixture.vkey, fixture.trustedHeaderHash);
-    }
-
-    function loadFixture()
-        public
-        view
-        returns (SP1TendermintFixtureJson memory)
-    {
-        string memory root = vm.projectRoot();
-        string memory path = string.concat(root, "/fixtures/fixture.json");
-        string memory json = vm.readFile(path);
-        bytes32 trustedHeaderHash = json.readBytes32(".trustedHeaderHash");
-        bytes32 targetHeaderHash = json.readBytes32(".targetHeaderHash");
-        bytes32 vkey = json.readBytes32(".vkey");
-        bytes memory publicValues = json.readBytes(".publicValues");
-        bytes memory proof = json.readBytes(".proof");
-
-        SP1TendermintFixtureJson memory fixture = SP1TendermintFixtureJson({
-            trustedHeaderHash: trustedHeaderHash,
-            targetHeaderHash: targetHeaderHash,
-            vkey: vkey,
-            publicValues: publicValues,
-            proof: proof
-        });
-
-        return fixture;
-    }
+    function setUp() public {}
 
     function run() public returns (address) {
         vm.startBroadcast();
+        // Read vkey and trusted header hash from .env
+        bytes32 vkey = bytes32(vm.envBytes("VKEY_DIGEST"));
+        bytes32 trustedHeaderHash = bytes32(vm.envBytes("TRUSTED_HEADER_HASH"));
+        tendermint = new SP1Tendermint(vkey, trustedHeaderHash);
+        vm.stopBroadcast();
 
         return address(tendermint);
     }
