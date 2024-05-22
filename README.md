@@ -60,7 +60,7 @@ $ forge test -vvv
 
     This will output `TRUSTED_HEADER_HASH` and `VKEY_DIGEST`.
 
-2. Copy the initialization parameters from the output and them to the `contracts/.env` file:
+2. Copy the initialization parameters from the output into the `contracts/.env` file:
 
     ```shell
     TRUSTED_HEADER_HASH=<trusted_header_hash>
