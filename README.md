@@ -23,15 +23,15 @@ $ RUST_LOG=info cargo run --bin test --release -- --trusted-block <TRUSTED_BLOCK
 
 * Follow instructions to install [SP1](https://succinctlabs.github.io/sp1/).
 * Install [Forge](https://book.getfoundry.sh/getting-started/installation.html).
-* Install go and make sure that `go` is in your `PATH` (you can run `go version` to check).
+* Install go and make sure that `go` is in your `PATH` (you can run `go version` to check). Your Go version should be >1.22.1
 
-## Generate Fixtures for Forge Testing
+## Fixtures for Forge Tests
 
 To generate fixtures for local testing run:
 
 ```shell
 $ cd operator
-$ RUST_LOG=debug TENDERMINT_RPC_URL="https://rpc.celestia-mocha.com/" cargo run --release --bin fixture -- --trusted-block 2 --target-block 6
+$ RUST_LOG=debug TENDERMINT_RPC_URL="https://rpc.celestia-mocha.com/" cargo run --release --bin fixture -- --trusted-block 200 --target-block 600
 ```
 
 This will take around 10 minutes to complete (as benchmarked on a Macbook Pro M2), as it is generating a full Tendermint proof locally (including recursive aggregation + groth16 verification). In this case, the "core proof" will generate quickly, but the recursive aggregation will take longer because the core proof has several precompiles enabled that cause recursive aggregation to take longer than in the case of a simpler program.
@@ -49,23 +49,41 @@ $ cd contracts
 $ forge test -vvv
 ```
 
-## Deploy Contracts
+## Run Tendermint Operator End to End
 
-You can use the forge script to deploy the SP1Tendermint contract to a testnet network:
+1. Generate the initialization parameters for the contract:
 
-```shell
-$ cd contracts
-$ forge script script/SP1Tendermint.s.sol --rpc-url $RPC_URL --private-key $PRIVATE_KEY --etherscan-api-key $ETHERSCAN_API_KEY --broadcast --verify
-```
+    ```shell
+    cd operator
+    cargo run --bin genesis --release
+    ```
 
-## Run Operator
+2. Add the initialization parameters to the `contracts/.env` file:
 
-To run the example operator with a deployed Tendermint contract run:
+    ```shell
+    TRUSTED_HEADER_HASH=<trusted_header_hash>
+    VKEY_DIGEST=<vkey_digest>
+    ```
 
-CHAIN_ID=<chain_id> RPC_URL=<rpc_url> PRIVATE_KEY=<private_key> cargo run --bin operator
+3. Deploy the `SP1Tendermint` contract.
 
-```shell
-$ cd operator
-$ cargo run --bin operator
-```
+    ```shell
+    cd contracts
+
+    forge script script/SP1Tendermint.s.sol --rpc-url $RPC_URL --private-key $PRIVATE_KEY --etherscan-api-key $ETHERSCAN_API_KEY --broadcast --verify
+    ```
+
+4. Add the operator configuration to the `/.env` file:
+    ```shell
+    CHAIN_ID=
+    RPC_URL=
+    CONTRACT_ADDRESS=
+    PRIVATE_KEY=
+    ```
+
+5. Run the operator.
+    ```shell
+    cd operator
+    cargo run --bin operator --release
+    ```
 

@@ -12,7 +12,7 @@ async fn main() -> anyhow::Result<()> {
     export_solidity_groth16_verifier(PathBuf::from("../contracts/src"))
         .expect("failed to export verifier");
 
-    // Now generate the vkey digest to use in the contract.
+    // Generate the vkey digest to use in the contract.
     let prover = MockProver::new();
     let (_, vk) = prover.setup(TENDERMINT_ELF);
     print!("VKEY_DIGEST={}", vk.bytes32());

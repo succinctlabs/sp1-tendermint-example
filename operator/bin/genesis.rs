@@ -1,5 +1,6 @@
 use clap::Parser;
-use tendermint_operator::util::TendermintRPCClient;
+use sp1_sdk::{HashableKey, MockProver, Prover};
+use tendermint_operator::{util::TendermintRPCClient, TENDERMINT_ELF};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -9,12 +10,11 @@ struct GenesisArgs {
     trusted_block: Option<u64>,
 }
 
-/// Writes the proof data for the given trusted and target blocks to the given fixture path.
+/// Fetches the trusted header hash for the given block height. Defaults to the latest block height.
 /// Example:
 /// ```
-/// RUST_LOG=info cargo run --bin fixture --release -- --trusted-block=1 --target-block=5
+/// RUST_LOG=info cargo run --bin genesis --release
 /// ```
-/// The fixture will be written to the path: ./contracts/fixtures/fixture_1:5.json
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
@@ -22,17 +22,22 @@ async fn main() -> anyhow::Result<()> {
 
     let args = GenesisArgs::parse();
 
+    // Generate the vkey digest to use in the contract.
+    let prover = MockProver::new();
+    let (_, vk) = prover.setup(TENDERMINT_ELF);
+    println!("VKEY_DIGEST={}", vk.bytes32());
+
     let tendermint_client = TendermintRPCClient::default();
 
     if let Some(trusted_block) = args.trusted_block {
         let commit = tendermint_client.fetch_commit(trusted_block).await?;
-        print!(
+        println!(
             "TRUSTED_HEADER_HASH={}",
             commit.result.signed_header.header.hash()
         );
     } else {
         let latest_commit = tendermint_client.fetch_latest_commit().await?;
-        print!(
+        println!(
             "TRUSTED_HEADER_HASH={}",
             latest_commit.result.signed_header.header.hash()
         );
