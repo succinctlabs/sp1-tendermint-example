@@ -26,6 +26,7 @@ impl TendermintProver {
         log::info!("Initializing SP1 ProverClient...");
         let prover_client = ProverClient::new();
         let (pkey, vkey) = prover_client.setup(TENDERMINT_ELF);
+        log::info!("SP1 ProverClient initialized");
         Self {
             prover_client,
             pkey,

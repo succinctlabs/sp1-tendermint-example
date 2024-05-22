@@ -16,7 +16,7 @@ To test that your Tendermint program is working correctly, set `SP1_PROVER=mock`
 
 ```shell
 $ cd operator
-$ RUST_LOG=info cargo run --bin test --release -- --trusted-block <TRUSTED_BLOCK> --target-block <TARGET_BLOCK>
+$ RUST_LOG=info TENDERMINT_RPC_URL="https://rpc.celestia-mocha.com/" cargo run --bin test --release -- --trusted-block 500 --target-block 1000
 ```
 
 ## End to end deployment
@@ -31,7 +31,7 @@ To generate fixtures for local testing run:
 
 ```shell
 $ cd operator
-$ RUST_LOG=debug TENDERMINT_RPC_URL="https://rpc.celestia-mocha.com/" cargo run --release --bin fixture -- --trusted-block 200 --target-block 600
+$ RUST_LOG=debug TENDERMINT_RPC_URL="https://rpc.celestia-mocha.com/" cargo run --release --bin fixture -- --trusted-block 500 --target-block 1000
 ```
 
 This will take around 10 minutes to complete (as benchmarked on a Macbook Pro M2), as it is generating a full Tendermint proof locally (including recursive aggregation + groth16 verification). In this case, the "core proof" will generate quickly, but the recursive aggregation will take longer because the core proof has several precompiles enabled that cause recursive aggregation to take longer than in the case of a simpler program.
@@ -51,21 +51,23 @@ $ forge test -vvv
 
 ## Run Tendermint Operator End to End
 
-1. Generate the initialization parameters for the contract:
+1. Generate the initialization parameters for the contract.
 
     ```shell
     cd operator
     cargo run --bin genesis --release
     ```
 
-2. Add the initialization parameters to the `contracts/.env` file:
+    This will output `TRUSTED_HEADER_HASH` and `VKEY_DIGEST`.
+
+2. Copy the initialization parameters from the output and them to the `contracts/.env` file:
 
     ```shell
     TRUSTED_HEADER_HASH=<trusted_header_hash>
     VKEY_DIGEST=<vkey_digest>
     ```
 
-3. Deploy the `SP1Tendermint` contract.
+3. Deploy the `SP1Tendermint` contract with the initialization parameters:
 
     ```shell
     cd contracts
@@ -81,7 +83,7 @@ $ forge test -vvv
     PRIVATE_KEY=
     ```
 
-5. Run the operator.
+5. Run the Tendermint operator.
     ```shell
     cd operator
     cargo run --bin operator --release
