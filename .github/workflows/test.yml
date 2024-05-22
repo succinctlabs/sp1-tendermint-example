@@ -1,6 +1,11 @@
 name: test
 
-on: workflow_dispatch
+on:
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - synchronize
 
 env:
   FOUNDRY_PROFILE: ci
