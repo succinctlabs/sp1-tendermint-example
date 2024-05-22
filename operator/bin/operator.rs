@@ -1,4 +1,5 @@
 use alloy_sol_types::{sol, SolCall};
+use sp1_sdk::utils::setup_logger;
 use std::time::Duration;
 use tendermint_operator::{contract::ContractClient, TendermintProver};
 
@@ -19,6 +20,8 @@ sol! {
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
+
+    setup_logger();
 
     // Instantiate a contract client to interact with the deployed Solidity Tendermint contract.
     let contract_client = ContractClient::default();
