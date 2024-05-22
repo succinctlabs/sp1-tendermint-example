@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 use crate::types::*;
+use anyhow::Result;
 use reqwest::Client;
 use std::{collections::HashMap, env, error::Error};
 use subtle_encoding::hex;
@@ -131,7 +132,7 @@ impl TendermintRPCClient {
     }
 
     /// Fetches the latest commit from the Tendermint node.
-    async fn fetch_latest_commit(&self) -> Result<CommitResponse, Box<dyn Error>> {
+    pub async fn fetch_latest_commit(&self) -> Result<CommitResponse> {
         let url = format!("{}/commit", self.url);
         let client = Client::new();
 
@@ -145,7 +146,7 @@ impl TendermintRPCClient {
     }
 
     /// Fetches a commit for a specific block height.
-    async fn fetch_commit(&self, block_height: u64) -> Result<CommitResponse, Box<dyn Error>> {
+    pub async fn fetch_commit(&self, block_height: u64) -> Result<CommitResponse> {
         let url = format!("{}/{}", self.url, "commit");
 
         let client = Client::new();
