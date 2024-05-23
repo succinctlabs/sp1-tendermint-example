@@ -10,6 +10,8 @@ import {SP1Verifier} from "../src/SP1Verifier.sol";
 struct SP1TendermintFixtureJson {
     bytes32 trustedHeaderHash;
     bytes32 targetHeaderHash;
+    uint64 trustedHeight;
+    uint64 targetHeight;
     bytes32 vkey;
     bytes publicValues;
     bytes proof;
@@ -22,9 +24,11 @@ contract SP1TendermintTest is Test {
 
     function setUp() public {
         SP1TendermintFixtureJson memory fixture = loadFixture();
-        console.logBytes32(fixture.vkey);
-        console.logBytes32(fixture.trustedHeaderHash);
-        tendermint = new SP1Tendermint(fixture.vkey, fixture.trustedHeaderHash);
+        tendermint = new SP1Tendermint(
+            fixture.vkey,
+            fixture.trustedHeaderHash,
+            fixture.trustedHeight
+        );
     }
 
     function loadFixture()
@@ -37,6 +41,8 @@ contract SP1TendermintTest is Test {
         string memory json = vm.readFile(path);
         bytes32 trustedHeaderHash = json.readBytes32(".trustedHeaderHash");
         bytes32 targetHeaderHash = json.readBytes32(".targetHeaderHash");
+        uint64 trustedHeight = uint64(json.readUint(".trustedHeight"));
+        uint64 targetHeight = uint64(json.readUint(".targetHeight"));
         bytes32 vkey = json.readBytes32(".vkey");
         bytes memory publicValues = json.readBytes(".publicValues");
         bytes memory proof = json.readBytes(".proof");
@@ -44,6 +50,8 @@ contract SP1TendermintTest is Test {
         SP1TendermintFixtureJson memory fixture = SP1TendermintFixtureJson({
             trustedHeaderHash: trustedHeaderHash,
             targetHeaderHash: targetHeaderHash,
+            trustedHeight: trustedHeight,
+            targetHeight: targetHeight,
             vkey: vkey,
             publicValues: publicValues,
             proof: proof
@@ -58,6 +66,7 @@ contract SP1TendermintTest is Test {
         tendermint.verifyTendermintProof(fixture.proof, fixture.publicValues);
 
         assert(tendermint.latestHeader() == fixture.targetHeaderHash);
+        assert(tendermint.latestHeight() == fixture.targetHeight);
     }
 
     function testFail_InvalidTendermint() public {
@@ -68,7 +77,5 @@ contract SP1TendermintTest is Test {
 
         // Create fixture of the length of the proof bytes.
         tendermint.verifyTendermintProof(fakeProof, fixture.publicValues);
-
-        assert(tendermint.latestHeader() == fixture.targetHeaderHash);
     }
 }

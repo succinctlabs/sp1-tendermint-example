@@ -1,5 +1,5 @@
 use clap::Parser;
-use sp1_sdk::{HashableKey, MockProver, Prover};
+use sp1_sdk::{utils::setup_logger, HashableKey, MockProver, Prover};
 use tendermint_operator::{util::TendermintRPCClient, TENDERMINT_ELF};
 
 #[derive(Parser, Debug)]
@@ -15,10 +15,11 @@ struct GenesisArgs {
 /// ```
 /// RUST_LOG=info cargo run --bin genesis --release
 /// ```
+///
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
-    sp1_sdk::utils::setup_logger();
+    setup_logger();
 
     let args = GenesisArgs::parse();
 
@@ -30,13 +31,18 @@ async fn main() -> anyhow::Result<()> {
     let tendermint_client = TendermintRPCClient::default();
 
     if let Some(trusted_block) = args.trusted_block {
-        let commit = tendermint_client.fetch_commit(trusted_block).await?;
+        let commit = tendermint_client.get_commit(trusted_block).await?;
+        println!("TRUSTED_HEIGHT={}", trusted_block);
         println!(
             "TRUSTED_HEADER_HASH={}",
             commit.result.signed_header.header.hash()
         );
     } else {
-        let latest_commit = tendermint_client.fetch_latest_commit().await?;
+        let latest_commit = tendermint_client.get_latest_commit().await?;
+        println!(
+            "TRUSTED_HEIGHT={}",
+            latest_commit.result.signed_header.header.height.value()
+        );
         println!(
             "TRUSTED_HEADER_HASH={}",
             latest_commit.result.signed_header.header.hash()

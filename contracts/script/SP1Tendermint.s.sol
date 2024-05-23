@@ -7,14 +7,6 @@ import {stdJson} from "forge-std/StdJson.sol";
 import {SP1Tendermint} from "../src/SP1Tendermint.sol";
 import {SP1Verifier} from "../src/SP1Verifier.sol";
 
-struct SP1TendermintFixtureJson {
-    bytes32 trustedHeaderHash;
-    bytes32 targetHeaderHash;
-    bytes32 vkey;
-    bytes publicValues;
-    bytes proof;
-}
-
 contract SP1TendermintScript is Script {
     using stdJson for string;
 
@@ -26,8 +18,9 @@ contract SP1TendermintScript is Script {
         vm.startBroadcast();
         // Read vkey and trusted header hash from .env
         bytes32 vkey = bytes32(vm.envBytes("VKEY_DIGEST"));
+        uint64 trustedHeight = uint64(vm.envUint("TRUSTED_HEIGHT"));
         bytes32 trustedHeaderHash = bytes32(vm.envBytes("TRUSTED_HEADER_HASH"));
-        tendermint = new SP1Tendermint(vkey, trustedHeaderHash);
+        tendermint = new SP1Tendermint(vkey, trustedHeaderHash, trustedHeight);
         vm.stopBroadcast();
 
         return address(tendermint);

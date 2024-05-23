@@ -1,6 +1,7 @@
 use clap::Parser;
 use log::info;
-use tendermint_operator::TendermintProver;
+use sp1_sdk::utils::setup_logger;
+use tendermint_operator::{util::TendermintRPCClient, TendermintProver};
 use tokio::runtime;
 
 #[derive(Parser, Debug)]
@@ -18,25 +19,23 @@ struct ScriptArgs {
 /// Generate a proof between the given trusted and target blocks.
 /// Example:
 /// ```
-/// RUST_LOG=info cargo run --bin test --release -- --trusted-block=<TRUSTED_BLOCK> --target-block=<TARGET_BLOCK>
+/// RUST_LOG=info SP1_PROVER=mock cargo run --bin test --release -- --trusted-block=<TRUSTED_BLOCK> --target-block=<TARGET_BLOCK>
 /// ```
-// TODO: When https://github.com/succinctlabs/sp1/pull/687 is merged, we can make this an async
-// program as block_in_place will handle prove_groth16.
 fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
-    sp1_sdk::utils::setup_logger();
+    setup_logger();
 
     let args = ScriptArgs::parse();
 
-    // Set the prover to mock mode. This is useful for testing the program.
+    let tendermint_rpc_client = TendermintRPCClient::default();
     let prover = TendermintProver::new();
 
     let rt = runtime::Runtime::new()?;
 
-    // Fetch the inputs for the proof.
+    // Get the inputs for the proof.
     let (trusted_light_block, target_light_block) = rt.block_on(async {
-        prover
-            .fetch_light_blocks(args.trusted_block, args.target_block)
+        tendermint_rpc_client
+            .get_light_blocks(args.trusted_block, args.target_block)
             .await
     });
 
@@ -49,7 +48,11 @@ fn main() -> anyhow::Result<()> {
         .verify_groth16(&proof, &prover.vkey)
         .expect("Verification failed");
 
-    info!("Successfully generated proof!");
+    info!(
+        "Successfully generated proof from block {} to {}!",
+        trusted_light_block.signed_header.header.height.value(),
+        target_light_block.signed_header.header.height.value()
+    );
 
     Ok(())
 }

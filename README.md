@@ -16,7 +16,7 @@ To test that your Tendermint program is working correctly, set `SP1_PROVER=mock`
 
 ```shell
 $ cd operator
-$ RUST_LOG=info TENDERMINT_RPC_URL="https://rpc.celestia-mocha.com/" cargo run --bin test --release -- --trusted-block 500 --target-block 1000
+$ RUST_LOG=info SP1_PROVER=mock TENDERMINT_RPC_URL="https://rpc.celestia-mocha.com/" cargo run --bin test --release -- --trusted-block 500 --target-block 1000
 ```
 
 ## End to end deployment
@@ -31,10 +31,8 @@ To generate fixtures for local testing run:
 
 ```shell
 $ cd operator
-$ RUST_LOG=debug TENDERMINT_RPC_URL="https://rpc.celestia-mocha.com/" cargo run --release --bin fixture -- --trusted-block 500 --target-block 1000
+$ RUST_LOG=info TENDERMINT_RPC_URL="https://rpc.celestia-mocha.com/" cargo run --release --bin fixture -- --trusted-block 500 --target-block 1000
 ```
-
-This will take around 10 minutes to complete (as benchmarked on a Macbook Pro M2), as it is generating a full Tendermint proof locally (including recursive aggregation + groth16 verification). In this case, the "core proof" will generate quickly, but the recursive aggregation will take longer because the core proof has several precompiles enabled that cause recursive aggregation to take longer than in the case of a simpler program.
 
 Then, you can run the vkey script to export the Solidity verifier and generate the vkey digest, which is used in the contract:
 
@@ -58,12 +56,13 @@ $ forge test -vvv
     cargo run --bin genesis --release
     ```
 
-    This will output `TRUSTED_HEADER_HASH` and `VKEY_DIGEST`.
+    This will output `TRUSTED_HEADER_HASH`, `TRUSTED_HEIGHT` and `VKEY_DIGEST`.
 
 2. Copy the initialization parameters from the output into the `contracts/.env` file:
 
     ```shell
     TRUSTED_HEADER_HASH=<trusted_header_hash>
+    TRUSTED_HEIGHT=<trusted_height>
     VKEY_DIGEST=<vkey_digest>
     ```
 

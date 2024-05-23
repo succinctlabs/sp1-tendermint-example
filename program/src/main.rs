@@ -44,4 +44,6 @@ fn main() {
 
     sp1_zkvm::io::commit_slice(header_hash_1.as_bytes());
     sp1_zkvm::io::commit_slice(header_hash_2.as_bytes());
+    sp1_zkvm::io::commit(&light_block_1.signed_header.header.height.value());
+    sp1_zkvm::io::commit(&light_block_2.signed_header.header.height.value());
 }
