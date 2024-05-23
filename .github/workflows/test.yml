@@ -29,17 +29,20 @@ jobs:
 
       - name: Run Forge install
         run: |
+          cd contracts
           forge --version
           forge install
         id: install
 
       - name: Run Forge build
         run: |
+          cd contracts
           forge --version
           forge build --sizes
         id: build
 
       - name: Run Forge tests
         run: |
+          cd contracts
           forge test -vvv
         id: test
