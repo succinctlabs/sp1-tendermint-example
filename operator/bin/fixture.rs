@@ -1,9 +1,9 @@
 use alloy_sol_types::{sol, SolType};
 use clap::Parser;
 use serde::{Deserialize, Serialize};
-use sp1_sdk::HashableKey;
+use sp1_sdk::{utils::setup_logger, HashableKey};
 use std::path::PathBuf;
-use tendermint_operator::TendermintProver;
+use tendermint_operator::{util::TendermintRPCClient, TendermintProver};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -43,20 +43,21 @@ struct TendermintFixture {
 /// The fixture will be written to the path: ./contracts/fixtures/fixture_1:5.json
 fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
-    sp1_sdk::utils::setup_logger();
+    setup_logger();
 
     let args = FixtureArgs::parse();
 
-    let prover = TendermintProver::new();
+    let tendermint_rpc_client = TendermintRPCClient::default();
 
     let runtime = tokio::runtime::Runtime::new().unwrap();
     let (trusted_light_block, target_light_block) = runtime.block_on(async {
-        prover
-            .fetch_light_blocks(args.trusted_block, args.target_block)
+        tendermint_rpc_client
+            .get_light_blocks(args.trusted_block, args.target_block)
             .await
     });
-    // Generate a header update proof for the specified blocks.
 
+    let prover = TendermintProver::new();
+    // Generate a header update proof for the specified blocks.
     let proof_data = prover.generate_tendermint_proof(&trusted_light_block, &target_light_block);
 
     let bytes = proof_data.public_values.as_slice();

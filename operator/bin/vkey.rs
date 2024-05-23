@@ -1,4 +1,7 @@
-use sp1_sdk::{artifacts::export_solidity_groth16_verifier, HashableKey, MockProver, Prover};
+use sp1_sdk::{
+    artifacts::export_solidity_groth16_verifier, utils::setup_logger, HashableKey, MockProver,
+    Prover,
+};
 use std::path::PathBuf;
 use tendermint_operator::TENDERMINT_ELF;
 
@@ -6,7 +9,7 @@ use tendermint_operator::TENDERMINT_ELF;
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
-    sp1_sdk::utils::setup_logger();
+    setup_logger();
 
     // Export the solidity verifier to the contracts/src directory.
     export_solidity_groth16_verifier(PathBuf::from("../contracts/src"))

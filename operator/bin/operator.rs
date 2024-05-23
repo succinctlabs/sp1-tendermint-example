@@ -2,7 +2,7 @@ use alloy_sol_types::{sol, SolCall};
 use log::{debug, info};
 use sp1_sdk::utils::setup_logger;
 use std::time::Duration;
-use tendermint_operator::{contract::ContractClient, TendermintProver};
+use tendermint_operator::{contract::ContractClient, util::TendermintRPCClient, TendermintProver};
 
 sol! {
     contract SP1Tendermint {
@@ -21,13 +21,13 @@ sol! {
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
-
     setup_logger();
 
     // Instantiate a contract client to interact with the deployed Solidity Tendermint contract.
     let contract_client = ContractClient::default();
 
     // Instantiate a Tendermint prover based on the environment variable.
+    let tendermint_rpc_client = TendermintRPCClient::default();
     let prover = TendermintProver::new();
 
     loop {
@@ -36,12 +36,12 @@ async fn main() -> anyhow::Result<()> {
         let trusted_header_hash = contract_client.read(latest_header_call_data).await?;
 
         // Generate a header update proof from the trusted block to the latest block.
-        let trusted_block_height = prover
+        let trusted_block_height = tendermint_rpc_client
             .get_block_height_from_hash(&trusted_header_hash)
             .await;
-        let latest_block_height = prover.fetch_latest_block_height().await;
-        let (trusted_light_block, target_light_block) = prover
-            .fetch_light_blocks(trusted_block_height, latest_block_height)
+        let latest_block_height = tendermint_rpc_client.get_latest_block_height().await;
+        let (trusted_light_block, target_light_block) = tendermint_rpc_client
+            .get_light_blocks(trusted_block_height, latest_block_height)
             .await;
         let proof_data =
             prover.generate_tendermint_proof(&trusted_light_block, &target_light_block);
