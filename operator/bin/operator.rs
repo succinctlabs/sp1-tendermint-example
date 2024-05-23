@@ -58,7 +58,10 @@ async fn main() -> anyhow::Result<()> {
             .send(verify_tendermint_proof_call_data)
             .await?;
 
-        info!("Successfully relayed proof to contract!");
+        info!(
+            "Updated contract's latest block from {} to {}.",
+            trusted_block_height, latest_block_height
+        );
 
         // Sleep for 60 seconds.
         debug!("sleeping for 60 seconds");

@@ -49,7 +49,7 @@ fn main() -> anyhow::Result<()> {
         .expect("Verification failed");
 
     info!(
-        "Successfully generated proof from block {} to {}.",
+        "Successfully generated proof from block {} to {}!",
         trusted_light_block.signed_header.header.height.value(),
         target_light_block.signed_header.header.height.value()
     );
