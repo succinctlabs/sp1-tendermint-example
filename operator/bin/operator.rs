@@ -1,5 +1,5 @@
 use alloy_sol_types::{sol, SolCall};
-use log::info;
+use log::{debug, info};
 use sp1_sdk::utils::setup_logger;
 use std::time::Duration;
 use tendermint_operator::{contract::ContractClient, TendermintProver};
@@ -58,8 +58,10 @@ async fn main() -> anyhow::Result<()> {
             .send(verify_tendermint_proof_call_data)
             .await?;
 
+        info!("Successfully relayed proof to contract!");
+
         // Sleep for 60 seconds.
-        println!("sleeping for 60 seconds");
+        debug!("sleeping for 60 seconds");
         tokio::time::sleep(Duration::from_secs(60)).await;
     }
 }
