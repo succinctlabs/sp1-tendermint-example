@@ -1,5 +1,5 @@
 use clap::Parser;
-use log::{debug, info};
+use log::info;
 use sp1_sdk::utils::setup_logger;
 use tendermint_operator::{util::TendermintRPCClient, TendermintProver};
 use tokio::runtime;

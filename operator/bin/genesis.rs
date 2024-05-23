@@ -32,12 +32,17 @@ async fn main() -> anyhow::Result<()> {
 
     if let Some(trusted_block) = args.trusted_block {
         let commit = tendermint_client.get_commit(trusted_block).await?;
+        println!("TRUSTED_HEIGHT={}", trusted_block);
         println!(
             "TRUSTED_HEADER_HASH={}",
             commit.result.signed_header.header.hash()
         );
     } else {
         let latest_commit = tendermint_client.get_latest_commit().await?;
+        println!(
+            "TRUSTED_HEIGHT={}",
+            latest_commit.result.signed_header.header.height.value()
+        );
         println!(
             "TRUSTED_HEADER_HASH={}",
             latest_commit.result.signed_header.header.hash()

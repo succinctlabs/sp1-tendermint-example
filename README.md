@@ -56,12 +56,13 @@ $ forge test -vvv
     cargo run --bin genesis --release
     ```
 
-    This will output `TRUSTED_HEADER_HASH` and `VKEY_DIGEST`.
+    This will output `TRUSTED_HEADER_HASH`, `TRUSTED_HEIGHT` and `VKEY_DIGEST`.
 
 2. Copy the initialization parameters from the output into the `contracts/.env` file:
 
     ```shell
     TRUSTED_HEADER_HASH=<trusted_header_hash>
+    TRUSTED_HEIGHT=<trusted_height>
     VKEY_DIGEST=<vkey_digest>
     ```
 

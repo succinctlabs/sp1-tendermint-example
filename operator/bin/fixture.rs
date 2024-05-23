@@ -30,6 +30,8 @@ type TendermintProofTuple = sol! {
 struct TendermintFixture {
     trusted_header_hash: String,
     target_header_hash: String,
+    trusted_height: u64,
+    target_height: u64,
     vkey: String,
     public_values: String,
     proof: String,
@@ -67,6 +69,8 @@ fn main() -> anyhow::Result<()> {
     let fixture = TendermintFixture {
         trusted_header_hash: hex::encode(trusted_header_hash),
         target_header_hash: hex::encode(target_header_hash),
+        trusted_height: args.trusted_block,
+        target_height: args.target_block,
         vkey: prover.vkey.bytes32(),
         public_values: proof_data.public_values.bytes(),
         proof: proof_data.bytes(),
