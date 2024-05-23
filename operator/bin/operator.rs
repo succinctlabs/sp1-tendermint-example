@@ -1,4 +1,5 @@
 use alloy_sol_types::{sol, SolCall};
+use log::info;
 use sp1_sdk::utils::setup_logger;
 use std::time::Duration;
 use tendermint_operator::{contract::ContractClient, TendermintProver};
@@ -47,6 +48,7 @@ async fn main() -> anyhow::Result<()> {
 
         // Relay the proof to the contract.
         let proof_as_bytes = proof_data.proof.encoded_proof.into_bytes();
+        info!("Proof bytes: {:?}", hex::encode(proof_as_bytes));
         let verify_tendermint_proof_call_data = SP1Tendermint::verifyTendermintProofCall {
             publicValues: proof_data.public_values.to_vec().into(),
             proof: proof_as_bytes.into(),
