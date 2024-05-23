@@ -48,7 +48,7 @@ async fn main() -> anyhow::Result<()> {
 
         // Relay the proof to the contract.
         let proof_as_bytes = proof_data.proof.encoded_proof.into_bytes();
-        info!("Proof bytes: {:?}", hex::encode(proof_as_bytes));
+        info!("Proof bytes: {:?}", hex::encode(proof_as_bytes.clone()));
         let verify_tendermint_proof_call_data = SP1Tendermint::verifyTendermintProofCall {
             publicValues: proof_data.public_values.to_vec().into(),
             proof: proof_as_bytes.into(),
