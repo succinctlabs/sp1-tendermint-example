@@ -54,7 +54,6 @@ impl TendermintProver {
             .prover_client
             .prove_groth16(&self.pkey, stdin)
             .expect("proving failed");
-        println!("Successfully generated proof!");
 
         // Verify proof.
         self.prover_client

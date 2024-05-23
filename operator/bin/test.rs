@@ -1,5 +1,5 @@
 use clap::Parser;
-use log::info;
+use log::{debug, info};
 use sp1_sdk::utils::setup_logger;
 use tendermint_operator::{util::TendermintRPCClient, TendermintProver};
 use tokio::runtime;
@@ -48,7 +48,11 @@ fn main() -> anyhow::Result<()> {
         .verify_groth16(&proof, &prover.vkey)
         .expect("Verification failed");
 
-    info!("Successfully generated proof!");
+    info!(
+        "Successfully generated proof from block {} to {}.",
+        trusted_light_block.signed_header.header.height.value(),
+        target_light_block.signed_header.header.height.value()
+    );
 
     Ok(())
 }
