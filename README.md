@@ -75,6 +75,8 @@ $ forge test -vvv
     forge script script/SP1Tendermint.s.sol --rpc-url $RPC_URL --private-key $PRIVATE_KEY --etherscan-api-key $ETHERSCAN_API_KEY --broadcast --verify
     ```
 
+    If deploying on Sepolia, add `--legacy`.
+
 4. Add the operator configuration to the `/.env` file:
     ```shell
     CHAIN_ID=

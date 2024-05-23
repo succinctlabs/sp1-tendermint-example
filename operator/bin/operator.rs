@@ -1,4 +1,5 @@
 use alloy_sol_types::{sol, SolCall};
+use log::{debug, info};
 use sp1_sdk::utils::setup_logger;
 use std::time::Duration;
 use tendermint_operator::{contract::ContractClient, TendermintProver};
@@ -46,7 +47,7 @@ async fn main() -> anyhow::Result<()> {
             prover.generate_tendermint_proof(&trusted_light_block, &target_light_block);
 
         // Relay the proof to the contract.
-        let proof_as_bytes = proof_data.proof.encoded_proof.into_bytes();
+        let proof_as_bytes = hex::decode(&proof_data.proof.encoded_proof).unwrap();
         let verify_tendermint_proof_call_data = SP1Tendermint::verifyTendermintProofCall {
             publicValues: proof_data.public_values.to_vec().into(),
             proof: proof_as_bytes.into(),
@@ -57,8 +58,10 @@ async fn main() -> anyhow::Result<()> {
             .send(verify_tendermint_proof_call_data)
             .await?;
 
+        info!("Successfully relayed proof to contract!");
+
         // Sleep for 60 seconds.
-        println!("sleeping for 60 seconds");
+        debug!("sleeping for 60 seconds");
         tokio::time::sleep(Duration::from_secs(60)).await;
     }
 }
