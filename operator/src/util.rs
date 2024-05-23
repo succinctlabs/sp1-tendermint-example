@@ -39,11 +39,11 @@ impl TendermintRPCClient {
         let peer_id = self.get_peer_id().await.unwrap();
 
         let trusted_light_block = self
-            .fetch_light_block(trusted_block_height, peer_id)
+            .get_light_block(trusted_block_height, peer_id)
             .await
             .expect("Failed to generate light block 1");
         let target_light_block = self
-            .fetch_light_block(target_block_height, peer_id)
+            .get_light_block(target_block_height, peer_id)
             .await
             .expect("Failed to generate light block 2");
         (trusted_light_block, target_light_block)
@@ -125,7 +125,7 @@ impl TendermintRPCClient {
     async fn get_light_block_by_hash(&self, hash: &[u8]) -> LightBlock {
         let block = self.get_block_by_hash(hash).await.unwrap();
         let peer_id = self.get_peer_id().await.unwrap();
-        self.fetch_light_block(
+        self.get_light_block(
             block.result.block.header.height.value(),
             hex::decode(peer_id).unwrap().try_into().unwrap(),
         )
@@ -198,7 +198,7 @@ impl TendermintRPCClient {
     }
 
     /// Gets a light block for a specific block height and peer ID.
-    async fn fetch_light_block(&self, block_height: u64, peer_id: [u8; 20]) -> Result<LightBlock> {
+    async fn get_light_block(&self, block_height: u64, peer_id: [u8; 20]) -> Result<LightBlock> {
         let commit_response = self.get_commit(block_height).await?;
         let mut signed_header = commit_response.result.signed_header;
 

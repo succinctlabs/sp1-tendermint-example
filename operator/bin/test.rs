@@ -32,7 +32,7 @@ fn main() -> anyhow::Result<()> {
 
     let rt = runtime::Runtime::new()?;
 
-    // Fetch the inputs for the proof.
+    // Get the inputs for the proof.
     let (trusted_light_block, target_light_block) = rt.block_on(async {
         tendermint_rpc_client
             .get_light_blocks(args.trusted_block, args.target_block)
