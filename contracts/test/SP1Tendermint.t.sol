@@ -63,21 +63,10 @@ contract SP1TendermintTest is Test {
     function test_ValidTendermint() public {
         SP1TendermintFixtureJson memory fixture = loadFixture();
 
-        (
-            bytes32 trustedHeaderHash,
-            bytes32 targetHeaderHash,
-            uint64 trustedHeight,
-            uint64 targetHeight
-        ) = tendermint.decodePublicValues(fixture.publicValues);
-
-        console.logUint(trustedHeight);
-
         tendermint.verifyTendermintProof(fixture.proof, fixture.publicValues);
 
-        console.logUint(fixture.targetHeight);
-        console.logUint(tendermint.latestHeight());
-        // assert(tendermint.latestHeader() == fixture.targetHeaderHash);
-        // assert(tendermint.latestHeight() == fixture.targetHeight);
+        assert(tendermint.latestHeader() == fixture.targetHeaderHash);
+        assert(tendermint.latestHeight() == fixture.targetHeight);
     }
 
     function testFail_InvalidTendermint() public {

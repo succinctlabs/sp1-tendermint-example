@@ -20,6 +20,19 @@ contract SP1Tendermint is SP1Verifier {
         latestHeight = _initialHeight;
     }
 
+    function reverseBytes64(uint64 input) internal pure returns (uint64) {
+        input =
+            ((input & 0xFF00FF00FF00FF00) >> 8) |
+            ((input & 0x00FF00FF00FF00FF) << 8);
+        input =
+            ((input & 0xFFFF0000FFFF0000) >> 16) |
+            ((input & 0x0000FFFF0000FFFF) << 16);
+        input =
+            ((input & 0xFFFFFFFF00000000) >> 32) |
+            ((input & 0x00000000FFFFFFFF) << 32);
+        return input;
+    }
+
     function decodePublicValues(
         bytes calldata publicValues
     ) public pure returns (bytes32, bytes32, uint64, uint64) {
@@ -36,8 +49,8 @@ contract SP1Tendermint is SP1Verifier {
             targetHeight := calldataload(add(publicValues.offset, 0x30))
         }
 
-        trustedHeight = trustedHeight & 0xffffffffffff;
-        targetHeight = targetHeight & 0xffffffffffff;
+        trustedHeight = reverseBytes64(trustedHeight);
+        targetHeight = reverseBytes64(targetHeight);
 
         return (
             trustedHeaderHash,
@@ -65,7 +78,7 @@ contract SP1Tendermint is SP1Verifier {
         }
 
         // Verify the proof with the associated public values. This will revert if proof invalid.
-        // this.verifyProof(tendermintProgramVkey, publicValues, proof);
+        this.verifyProof(tendermintProgramVkey, publicValues, proof);
 
         latestHeader = targetHeaderHash;
         latestHeight = targetHeight;
