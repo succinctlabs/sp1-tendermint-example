@@ -16,7 +16,7 @@ To test that your Tendermint program is working correctly, set `SP1_PROVER=mock`
 
 ```shell
 $ cd operator
-$ RUST_LOG=info TENDERMINT_RPC_URL="https://rpc.celestia-mocha.com/" cargo run --bin test --release -- --trusted-block 500 --target-block 1000
+$ RUST_LOG=info SP1_PROVER=mock TENDERMINT_RPC_URL="https://rpc.celestia-mocha.com/" cargo run --bin test --release -- --trusted-block 500 --target-block 1000
 ```
 
 ## End to end deployment

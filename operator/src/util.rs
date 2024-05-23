@@ -30,7 +30,7 @@ impl TendermintRPCClient {
         }
     }
 
-    /// Retrieves light blocks for the trusted and target block heights.
+    /// Gets light blocks for the trusted and target block heights.
     pub async fn get_light_blocks(
         &self,
         trusted_block_height: u64,
@@ -49,19 +49,19 @@ impl TendermintRPCClient {
         (trusted_light_block, target_light_block)
     }
 
-    /// Retrieves the latest block height from the Tendermint node.
+    /// Gets the latest block height from the Tendermint node.
     pub async fn get_latest_block_height(&self) -> u64 {
-        let latest_commit = self.fetch_latest_commit().await.unwrap();
+        let latest_commit = self.get_latest_commit().await.unwrap();
         latest_commit.result.signed_header.header.height.value()
     }
 
-    /// Retrieves the block height from a given block hash.
+    /// Gets the block height from a given block hash.
     pub async fn get_block_height_from_hash(&self, hash: &[u8]) -> u64 {
         let block = self.get_block_by_hash(hash).await.unwrap();
         block.result.block.header.height.value()
     }
 
-    /// Fetches a block by its hash.
+    /// Gets a block by its hash.
     async fn get_block_by_hash(&self, hash: &[u8]) -> Result<BlockResponse> {
         let block_by_hash_url = format!(
             "{}/block_by_hash?hash=0x{}",
@@ -103,7 +103,7 @@ impl TendermintRPCClient {
         });
     }
 
-    /// Fetches the peer ID from the Tendermint node.
+    /// Gets the peer ID from the Tendermint node.
     async fn get_peer_id(&self) -> Result<[u8; 20]> {
         let client = Client::new();
         let fetch_peer_id_url = format!("{}/status", self.url);
@@ -121,7 +121,7 @@ impl TendermintRPCClient {
             .unwrap())
     }
 
-    /// Fetches a light block by its hash.
+    /// Gets a light block by its hash.
     async fn get_light_block_by_hash(&self, hash: &[u8]) -> LightBlock {
         let block = self.get_block_by_hash(hash).await.unwrap();
         let peer_id = self.get_peer_id().await.unwrap();
@@ -133,8 +133,8 @@ impl TendermintRPCClient {
         .unwrap()
     }
 
-    /// Fetches the latest commit from the Tendermint node.
-    pub async fn fetch_latest_commit(&self) -> Result<CommitResponse> {
+    /// Get the latest commit from the Tendermint node.
+    pub async fn get_latest_commit(&self) -> Result<CommitResponse> {
         let url = format!("{}/commit", self.url);
         let response: CommitResponse = self
             .client
@@ -197,7 +197,7 @@ impl TendermintRPCClient {
         Ok(validators)
     }
 
-    /// Fetches a light block for a specific block height and peer ID.
+    /// Gets a light block for a specific block height and peer ID.
     async fn fetch_light_block(&self, block_height: u64, peer_id: [u8; 20]) -> Result<LightBlock> {
         let commit_response = self.get_commit(block_height).await?;
         let mut signed_header = commit_response.result.signed_header;

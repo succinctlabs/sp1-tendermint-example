@@ -37,7 +37,7 @@ async fn main() -> anyhow::Result<()> {
             commit.result.signed_header.header.hash()
         );
     } else {
-        let latest_commit = tendermint_client.fetch_latest_commit().await?;
+        let latest_commit = tendermint_client.get_latest_commit().await?;
         println!(
             "TRUSTED_HEADER_HASH={}",
             latest_commit.result.signed_header.header.hash()
