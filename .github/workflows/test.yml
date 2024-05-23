@@ -27,6 +27,12 @@ jobs:
         with:
           version: nightly
 
+      - name: Run Forge install
+        run: |
+          forge --version
+          forge install
+        id: install
+
       - name: Run Forge build
         run: |
           forge --version
