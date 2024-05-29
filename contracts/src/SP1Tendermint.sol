@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {SP1Verifier} from "./SP1Verifier.sol";
+import {SP1Verifier} from "@sp1-contracts/SP1Verifier.sol";
 
 contract SP1Tendermint is SP1Verifier {
     bytes32 public tendermintProgramVkey;
