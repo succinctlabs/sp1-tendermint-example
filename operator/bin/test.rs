@@ -45,7 +45,7 @@ fn main() -> anyhow::Result<()> {
     // Verify proof.
     prover
         .prover_client
-        .verify_groth16(&proof, &prover.vkey)
+        .verify_plonk(&proof, &prover.vkey)
         .expect("Verification failed");
 
     info!(
