@@ -5,7 +5,7 @@ import "forge-std/console.sol";
 import {Test} from "forge-std/Test.sol";
 import {stdJson} from "forge-std/StdJson.sol";
 import {SP1Tendermint} from "../src/SP1Tendermint.sol";
-import {SP1Verifier} from "../src/SP1Verifier.sol";
+import {SP1Verifier} from "@sp1-contracts/SP1Verifier.sol";
 
 struct SP1TendermintFixtureJson {
     bytes32 trustedHeaderHash;

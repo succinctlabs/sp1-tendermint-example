@@ -5441,7 +5441,6 @@ dependencies = [
  "serde_json",
  "sha2 0.10.8",
  "sp1-helper",
- "sp1-prover",
  "sp1-sdk",
  "subtle-encoding",
  "tendermint",

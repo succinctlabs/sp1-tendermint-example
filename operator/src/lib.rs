@@ -1,4 +1,4 @@
-use sp1_sdk::{ProverClient, SP1ProvingKey, SP1Stdin, SP1VerifyingKey};
+use sp1_sdk::{ProverClient, SP1PlonkBn254Proof, SP1ProvingKey, SP1Stdin, SP1VerifyingKey};
 use tendermint_light_client_verifier::types::LightBlock;
 
 pub mod contract;
@@ -39,7 +39,7 @@ impl TendermintProver {
         &self,
         trusted_light_block: &LightBlock,
         target_light_block: &LightBlock,
-    ) -> SP1Groth16Proof {
+    ) -> SP1PlonkBn254Proof {
         // Encode the light blocks to be input into our program.
         let encoded_1 = serde_cbor::to_vec(&trusted_light_block).unwrap();
         let encoded_2 = serde_cbor::to_vec(&target_light_block).unwrap();
