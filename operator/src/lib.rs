@@ -1,4 +1,4 @@
-use sp1_sdk::{ProverClient, SP1Groth16Proof, SP1ProvingKey, SP1Stdin, SP1VerifyingKey};
+use sp1_sdk::{ProverClient, SP1ProvingKey, SP1Stdin, SP1VerifyingKey};
 use tendermint_light_client_verifier::types::LightBlock;
 
 pub mod contract;
@@ -52,12 +52,12 @@ impl TendermintProver {
         // Generate the proof. Depending on SP1_PROVER env variable, this may be a mock, local or network proof.
         let proof = self
             .prover_client
-            .prove_groth16(&self.pkey, stdin)
+            .prove_plonk(&self.pkey, stdin)
             .expect("proving failed");
 
         // Verify proof.
         self.prover_client
-            .verify_groth16(&proof, &self.vkey)
+            .verify_plonk(&proof, &self.vkey)
             .expect("Verification failed");
 
         // Return the proof.
