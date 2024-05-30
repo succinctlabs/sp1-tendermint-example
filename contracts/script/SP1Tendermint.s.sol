@@ -16,10 +16,12 @@ contract SP1TendermintScript is Script {
 
     function run() public returns (address) {
         vm.startBroadcast();
-        // Read vkey and trusted header hash from .env
+
+        // Read trusted initialization parameters from .env
         bytes32 vkey = bytes32(vm.envBytes("VKEY_DIGEST"));
         uint64 trustedHeight = uint64(vm.envUint("TRUSTED_HEIGHT"));
         bytes32 trustedHeaderHash = bytes32(vm.envBytes("TRUSTED_HEADER_HASH"));
+
         SP1Verifier verifier = new SP1Verifier();
         tendermint = new SP1Tendermint(
             vkey,
