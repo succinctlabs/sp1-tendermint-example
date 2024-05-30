@@ -79,9 +79,9 @@ async fn main() -> anyhow::Result<()> {
     // Save the proof data to the file path.
     let fixture_path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(args.fixture_path);
 
-    // TODO: Change to prover.prover_type
+    // TODO: Change to prover.id
     let sp1_prover_type = env::var("SP1_PROVER");
-    if sp1_prover_type.is_ok() && sp1_prover_type.unwrap() == "mock" {
+    if sp1_prover_type.as_deref() == Ok("mock") {
         std::fs::write(
             fixture_path.join("mock_fixture.json"),
             serde_json::to_string_pretty(&fixture).unwrap(),

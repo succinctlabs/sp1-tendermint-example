@@ -31,7 +31,7 @@ To generate fixtures for local testing run:
 
 ```shell
 $ cd operator
-$ RUST_LOG=info TENDERMINT_RPC_URL="https://rpc.celestia-mocha.com/" cargo run --release --bin fixture -- --trusted-block 500 --target-block 1000
+$ RUST_LOG=info TENDERMINT_RPC_URL="https://rpc.celestia-mocha.com/" cargo run --bin fixture --release -- --trusted-block 500 --target-block 1000
 ```
 
 You can check that the generated fixture proofs verify by running the forge tests:

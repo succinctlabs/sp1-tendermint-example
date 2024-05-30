@@ -82,6 +82,7 @@ contract SP1TendermintTest is Test {
         assert(tendermint.latestHeight() == fixture.targetHeight);
     }
 
+    // Confirm that submitting an empty proof fails.
     function testFail_InvalidTendermint() public {
         SP1TendermintFixtureJson memory fixture = loadFixture("fixture.json");
 
@@ -92,12 +93,26 @@ contract SP1TendermintTest is Test {
         tendermint.verifyTendermintProof(fakeProof, fixture.publicValues);
     }
 
+    // Confirm that submitting an empty proof with the mock verifier passes.
     function test_ValidMockTendermint() public {
         SP1TendermintFixtureJson memory fixture = loadFixture(
             "mock_fixture.json"
         );
 
         mockTendermint.verifyTendermintProof(bytes(""), fixture.publicValues);
+
+        assert(mockTendermint.latestHeader() == fixture.targetHeaderHash);
+        assert(mockTendermint.latestHeight() == fixture.targetHeight);
+    }
+
+    // Confirm that submitting a non-empty proof with the mock verifier fails. This indicates that
+    // the user has passed in the wrong proof.
+    function testFail_Invalid_MockTendermint() public {
+        SP1TendermintFixtureJson memory fixture = loadFixture(
+            "mock_fixture.json"
+        );
+
+        mockTendermint.verifyTendermintProof(bytes("aa"), fixture.publicValues);
 
         assert(mockTendermint.latestHeader() == fixture.targetHeaderHash);
         assert(mockTendermint.latestHeight() == fixture.targetHeight);
