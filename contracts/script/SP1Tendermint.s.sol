@@ -20,7 +20,13 @@ contract SP1TendermintScript is Script {
         bytes32 vkey = bytes32(vm.envBytes("VKEY_DIGEST"));
         uint64 trustedHeight = uint64(vm.envUint("TRUSTED_HEIGHT"));
         bytes32 trustedHeaderHash = bytes32(vm.envBytes("TRUSTED_HEADER_HASH"));
-        tendermint = new SP1Tendermint(vkey, trustedHeaderHash, trustedHeight);
+        SP1Verifier verifier = new SP1Verifier();
+        tendermint = new SP1Tendermint(
+            vkey,
+            trustedHeaderHash,
+            trustedHeight,
+            address(verifier)
+        );
         vm.stopBroadcast();
 
         return address(tendermint);

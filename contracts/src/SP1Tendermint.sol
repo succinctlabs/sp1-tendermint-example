@@ -1,23 +1,26 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {SP1Verifier} from "@sp1-contracts/SP1Verifier.sol";
+import {ISP1Verifier} from "@sp1-contracts/ISP1Verifier.sol";
 
-contract SP1Tendermint is SP1Verifier {
+contract SP1Tendermint {
     bytes32 public tendermintProgramVkey;
     bytes32 public latestHeader;
     uint64 public latestHeight;
+    ISP1Verifier public verifier;
 
     error InvalidTrustedHeader();
 
     constructor(
         bytes32 _tendermintProgramVkey,
         bytes32 _initialBlockHash,
-        uint64 _initialHeight
+        uint64 _initialHeight,
+        address _verifier
     ) {
         tendermintProgramVkey = _tendermintProgramVkey;
         latestHeader = _initialBlockHash;
         latestHeight = _initialHeight;
+        verifier = ISP1Verifier(_verifier);
     }
 
     function reverseBytes64(uint64 input) internal pure returns (uint64) {
@@ -78,7 +81,7 @@ contract SP1Tendermint is SP1Verifier {
         }
 
         // Verify the proof with the associated public values. This will revert if proof invalid.
-        this.verifyProof(tendermintProgramVkey, publicValues, proof);
+        verifier.verifyProof(tendermintProgramVkey, publicValues, proof);
 
         latestHeader = targetHeaderHash;
         latestHeight = targetHeight;

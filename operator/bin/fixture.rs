@@ -2,7 +2,7 @@ use alloy_sol_types::{sol, SolType};
 use clap::Parser;
 use serde::{Deserialize, Serialize};
 use sp1_sdk::{utils::setup_logger, HashableKey};
-use std::path::PathBuf;
+use std::{env, path::PathBuf};
 use tendermint_operator::{util::TendermintRPCClient, TendermintProver};
 
 #[derive(Parser, Debug)]
@@ -42,8 +42,9 @@ struct TendermintFixture {
 /// ```
 /// RUST_LOG=info cargo run --bin fixture --release -- --trusted-block=1 --target-block=5
 /// ```
-/// The fixture will be written to the path: ./contracts/fixtures/fixture_1:5.json
-fn main() -> anyhow::Result<()> {
+/// The fixture will be written to the path: ./contracts/fixtures/fixture.json
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
     setup_logger();
 
@@ -51,16 +52,15 @@ fn main() -> anyhow::Result<()> {
 
     let tendermint_rpc_client = TendermintRPCClient::default();
 
-    let runtime = tokio::runtime::Runtime::new().unwrap();
-    let (trusted_light_block, target_light_block) = runtime.block_on(async {
-        tendermint_rpc_client
-            .get_light_blocks(args.trusted_block, args.target_block)
-            .await
-    });
+    let (trusted_light_block, target_light_block) = tendermint_rpc_client
+        .get_light_blocks(args.trusted_block, args.target_block)
+        .await;
 
-    let prover = TendermintProver::new();
+    let tendermint_prover = TendermintProver::new();
+
     // Generate a header update proof for the specified blocks.
-    let proof_data = prover.generate_tendermint_proof(&trusted_light_block, &target_light_block);
+    let proof_data =
+        tendermint_prover.generate_tendermint_proof(&trusted_light_block, &target_light_block);
 
     let bytes = proof_data.public_values.as_slice();
     let (trusted_header_hash, target_header_hash) =
@@ -71,18 +71,29 @@ fn main() -> anyhow::Result<()> {
         target_header_hash: hex::encode(target_header_hash),
         trusted_height: args.trusted_block,
         target_height: args.target_block,
-        vkey: prover.vkey.bytes32(),
+        vkey: tendermint_prover.vkey.bytes32(),
         public_values: proof_data.public_values.bytes(),
         proof: proof_data.bytes(),
     };
 
     // Save the proof data to the file path.
     let fixture_path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(args.fixture_path);
-    std::fs::write(
-        fixture_path.join("fixture.json"),
-        serde_json::to_string_pretty(&fixture).unwrap(),
-    )
-    .unwrap();
+
+    // TODO: Change to prover.prover_type
+    let sp1_prover_type = env::var("SP1_PROVER");
+    if sp1_prover_type.is_ok() && sp1_prover_type.unwrap() == "mock" {
+        std::fs::write(
+            fixture_path.join("mock_fixture.json"),
+            serde_json::to_string_pretty(&fixture).unwrap(),
+        )
+        .unwrap();
+    } else {
+        std::fs::write(
+            fixture_path.join("fixture.json"),
+            serde_json::to_string_pretty(&fixture).unwrap(),
+        )
+        .unwrap();
+    }
 
     Ok(())
 }
