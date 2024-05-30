@@ -93,7 +93,7 @@ contract SP1TendermintTest is Test {
         tendermint.verifyTendermintProof(fakeProof, fixture.publicValues);
     }
 
-    // Confirm that submitting an empty proof with the mock verifier passes.
+    // Confirm that submitting an empty proof passes the mock verifier.
     function test_ValidMockTendermint() public {
         SP1TendermintFixtureJson memory fixture = loadFixture(
             "mock_fixture.json"
@@ -105,8 +105,8 @@ contract SP1TendermintTest is Test {
         assert(mockTendermint.latestHeight() == fixture.targetHeight);
     }
 
-    // Confirm that submitting a non-empty proof with the mock verifier fails. This indicates that
-    // the user has passed in the wrong proof.
+    // Confirm that submitting a non-empty proof with the mock verifier fails. This typically
+    // indicates that the user has passed in a real proof to the mock verifier.
     function testFail_Invalid_MockTendermint() public {
         SP1TendermintFixtureJson memory fixture = loadFixture(
             "mock_fixture.json"
