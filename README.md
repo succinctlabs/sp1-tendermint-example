@@ -47,12 +47,15 @@ $ RUST_LOG=info SP1_PROVER=mock TENDERMINT_RPC_URL="https://rpc.celestia-mocha.c
 3. Deploy the `SP1Tendermint` contract with the initialization parameters:
 
     ```shell
-    cd contracts
+    cd ../contracts
 
-    forge script script/SP1Tendermint.s.sol --rpc-url $RPC_URL --private-key $PRIVATE_KEY --etherscan-api-key $ETHERSCAN_API_KEY --broadcast --verify
+    forge script script/SP1Tendermint.s.sol --rpc-url <RPC_URL> --private-key <PRIVATE_KEY> --etherscan-api-key <ETHERSCAN_API_KEY> --broadcast --verify
     ```
 
-    If deploying on Sepolia, add `--legacy`.
+    If you see the following error, add `--legacy` to the command.
+    ```shell
+    Error: Failed to get EIP-1559 fees    
+    ```
 
 4. Add the operator configuration to the `/.env` file:
     ```shell
