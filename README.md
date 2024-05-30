@@ -12,7 +12,7 @@ The SP1 Tendermint template is a simple example of a Tendermint light client on 
 
 ## Test Program
 
-To test that your Tendermint program is working correctly, set `SP1_PROVER=mock` to use a mock prover, and then run the test script in the operator folder. If this executes successfully, you will see a message like `Successfully generated proof!`.
+To test that your Tendermint program is working correctly, set `SP1_PROVER=mock` to use the mock prover, and then run the test script in the operator folder. If this executes successfully, you will see a message like `Successfully generated proof!`.
 
 ```shell
 $ cd operator
@@ -24,21 +24,6 @@ $ RUST_LOG=info SP1_PROVER=mock TENDERMINT_RPC_URL="https://rpc.celestia-mocha.c
 * Follow instructions to install [SP1](https://succinctlabs.github.io/sp1/).
 * Install [Forge](https://book.getfoundry.sh/getting-started/installation.html).
 * Install go and make sure that `go` is in your `PATH` (you can run `go version` to check). Your Go version should be >1.22.1
-
-## Fixtures for Forge Tests
-
-To generate fixtures for local testing run:
-
-```shell
-$ cd operator
-$ RUST_LOG=info TENDERMINT_RPC_URL="https://rpc.celestia-mocha.com/" cargo run --bin fixture --release -- --trusted-block 500 --target-block 1000
-```
-
-You can check that the generated fixture proofs verify by running the forge tests:
-```shell
-$ cd contracts
-$ forge test -vvv
-```
 
 ## Run Tendermint Operator End to End
 
@@ -83,3 +68,22 @@ $ forge test -vvv
     cargo run --bin operator --release
     ```
 
+## Fixtures for Forge Tests
+
+To generate fixtures for local testing run:
+
+```shell
+# Generates fixture.json (valid proof)
+$ cd operator
+$ RUST_LOG=info TENDERMINT_RPC_URL="https://rpc.celestia-mocha.com/" cargo run --bin fixture --release -- --trusted-block 500 --target-block 1000
+
+# Generates mock_fixture.json (mock proof)
+$ cd operator
+$ RUST_LOG=info SP1_PROVER=mock TENDERMINT_RPC_URL="https://rpc.celestia-mocha.com/" cargo run --bin fixture --release -- --trusted-block 500 --target-block 1000
+```
+
+You can check that the generated fixture proofs verify by running the forge tests:
+```shell
+$ cd contracts
+$ forge test -vvv
+```
