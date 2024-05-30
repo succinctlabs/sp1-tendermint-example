@@ -67,11 +67,11 @@ $ RUST_LOG=info SP1_PROVER=mock TENDERMINT_RPC_URL="https://rpc.celestia-mocha.c
 
 5. Run the Tendermint operator.
     ```shell
-    cd operator
-    cargo run --bin operator --release
+    cd ../operator
+    RUST_LOG=info cargo run --bin operator --release
     ```
 
-## Fixtures for Forge Tests
+## Generate fixtures for forge tests
 
 To generate fixtures for local testing run:
 
