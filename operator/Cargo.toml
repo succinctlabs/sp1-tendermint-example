@@ -12,20 +12,13 @@ name = "fixture"
 path = "bin/fixture.rs"
 
 [[bin]]
-name = "vkey"
-path = "bin/vkey.rs"
-
-[[bin]]
-name = "test"
-path = "bin/test.rs"
-
-[[bin]]
 name = "genesis"
 path = "bin/genesis.rs"
 
 [dependencies]
-sp1-sdk = { git = "https://github.com/succinctlabs/sp1.git", branch = "main" }
-sp1-prover = { git = "https://github.com/succinctlabs/sp1.git", branch = "main" }
+sp1-sdk = { git = "https://github.com/succinctlabs/sp1.git", tag = "v1.0.4-testnet", features = [
+    "plonk",
+] }
 reqwest = { version = "0.11", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
@@ -35,6 +28,7 @@ tendermint-light-client-verifier = { version = "0.35.0", default-features = fals
     "rust-crypto",
 ] }
 alloy-sol-types = "0.7.2"
+alloy-primitives = "0.7.2"
 bincode = "1.3.3"
 itertools = "0.12.1"
 serde_cbor = "0.11.2"
@@ -49,4 +43,4 @@ async-trait = "0.1.80"
 hex = "0.4.3"
 
 [build-dependencies]
-sp1-helper = { git = "https://github.com/succinctlabs/sp1.git", branch = "main" }
+sp1-helper = { git = "https://github.com/succinctlabs/sp1.git", tag = "v1.0.4-testnet" }

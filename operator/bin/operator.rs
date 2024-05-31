@@ -1,4 +1,5 @@
-use alloy_sol_types::{sol, SolCall};
+use alloy_primitives::U256;
+use alloy_sol_types::{sol, SolCall, SolValue};
 use log::{debug, info};
 use sp1_sdk::utils::setup_logger;
 use std::time::Duration;
@@ -7,6 +8,7 @@ use tendermint_operator::{contract::ContractClient, util::TendermintRPCClient, T
 sol! {
     contract SP1Tendermint {
         bytes32 public latestHeader;
+        uint64 public latestHeight;
 
         function verifyTendermintProof(
             bytes calldata proof,
@@ -32,13 +34,16 @@ async fn main() -> anyhow::Result<()> {
 
     loop {
         // Read the existing trusted header hash from the contract.
-        let latest_header_call_data = SP1Tendermint::latestHeaderCall {}.abi_encode();
-        let trusted_header_hash = contract_client.read(latest_header_call_data).await?;
+        let latest_height_call_data = SP1Tendermint::latestHeightCall {}.abi_encode();
+        let latest_height = contract_client.read(latest_height_call_data).await?;
+        let latest_height = U256::abi_decode(&latest_height, true).unwrap();
+        let trusted_block_height: u64 = latest_height.try_into().unwrap();
 
-        // Generate a header update proof from the trusted block to the latest block.
-        let trusted_block_height = tendermint_rpc_client
-            .get_block_height_from_hash(&trusted_header_hash)
-            .await;
+        // let latest_height: u64 = latest_height.try_into().unwrap();
+        if trusted_block_height == 0 {
+            panic!("No trusted height found in the contract, likely using an outdated contract.");
+        }
+
         let latest_block_height = tendermint_rpc_client.get_latest_block_height().await;
         let (trusted_light_block, target_light_block) = tendermint_rpc_client
             .get_light_blocks(trusted_block_height, latest_block_height)

@@ -5,7 +5,7 @@ import "forge-std/console.sol";
 import {Script} from "forge-std/Script.sol";
 import {stdJson} from "forge-std/StdJson.sol";
 import {SP1Tendermint} from "../src/SP1Tendermint.sol";
-import {SP1Verifier} from "../src/SP1Verifier.sol";
+import {SP1Verifier} from "@sp1-contracts/SP1Verifier.sol";
 
 contract SP1TendermintScript is Script {
     using stdJson for string;
@@ -16,11 +16,19 @@ contract SP1TendermintScript is Script {
 
     function run() public returns (address) {
         vm.startBroadcast();
-        // Read vkey and trusted header hash from .env
+
+        // Read trusted initialization parameters from .env
         bytes32 vkey = bytes32(vm.envBytes("VKEY_DIGEST"));
         uint64 trustedHeight = uint64(vm.envUint("TRUSTED_HEIGHT"));
         bytes32 trustedHeaderHash = bytes32(vm.envBytes("TRUSTED_HEADER_HASH"));
-        tendermint = new SP1Tendermint(vkey, trustedHeaderHash, trustedHeight);
+
+        SP1Verifier verifier = new SP1Verifier();
+        tendermint = new SP1Tendermint(
+            vkey,
+            trustedHeaderHash,
+            trustedHeight,
+            address(verifier)
+        );
         vm.stopBroadcast();
 
         return address(tendermint);
