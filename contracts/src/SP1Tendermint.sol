@@ -28,11 +28,11 @@ contract SP1Tendermint {
         bytes calldata publicValues
     ) public {
         (
-            bytes32 trustedHeaderHash,
-            bytes32 targetHeaderHash,
             uint64 trustedHeight,
-            uint64 targetHeight
-        ) = abi.decode(publicValues, (bytes32, bytes32, uint64, uint64));
+            uint64 targetHeight,
+            bytes32 trustedHeaderHash,
+            bytes32 targetHeaderHash
+        ) = abi.decode(publicValues, (uint64, uint64, bytes32, bytes32));
 
         if (
             trustedHeaderHash != latestHeader && trustedHeight != latestHeight
