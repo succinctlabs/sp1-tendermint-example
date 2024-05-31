@@ -12,14 +12,6 @@ name = "fixture"
 path = "bin/fixture.rs"
 
 [[bin]]
-name = "vkey"
-path = "bin/vkey.rs"
-
-[[bin]]
-name = "test"
-path = "bin/test.rs"
-
-[[bin]]
 name = "genesis"
 path = "bin/genesis.rs"
 

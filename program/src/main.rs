@@ -1,10 +1,20 @@
 #![no_main]
 sp1_zkvm::entrypoint!(main);
 
+use alloy_sol_types::{sol, SolValue};
 use core::time::Duration;
 use tendermint_light_client_verifier::{
     options::Options, types::LightBlock, ProdVerifier, Verdict, Verifier,
 };
+
+sol! {
+    struct TendermintOutput {
+        uint64 trustedHeight;
+        uint64 targetHeight;
+        bytes32 trustedHeaderHash;
+        bytes32 targetHeaderHash;
+    }
+}
 
 fn main() {
     // Read in 2 encoded vectors of two light blocks from the zkVM's stdin.
@@ -40,10 +50,16 @@ fn main() {
     // Now that we have verified our proof, we commit the header hashes to the zkVM to expose
     // them as public values.
     let header_hash_1 = light_block_1.signed_header.header.hash();
+    let header_hash_1: [u8; 32] = header_hash_1.as_bytes().to_vec().try_into().unwrap();
     let header_hash_2 = light_block_2.signed_header.header.hash();
+    let header_hash_2: [u8; 32] = header_hash_2.as_bytes().to_vec().try_into().unwrap();
 
-    sp1_zkvm::io::commit_slice(header_hash_1.as_bytes());
-    sp1_zkvm::io::commit_slice(header_hash_2.as_bytes());
-    sp1_zkvm::io::commit(&light_block_1.signed_header.header.height.value());
-    sp1_zkvm::io::commit(&light_block_2.signed_header.header.height.value());
+    let output = TendermintOutput {
+        trustedHeight: light_block_1.signed_header.header.height.value(),
+        targetHeight: light_block_2.signed_header.header.height.value(),
+        trustedHeaderHash: header_hash_1.into(),
+        targetHeaderHash: header_hash_2.into(),
+    };
+
+    sp1_zkvm::io::commit_slice(&output.abi_encode());
 }
