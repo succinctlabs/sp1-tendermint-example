@@ -11,6 +11,11 @@ contract SP1Tendermint {
 
     error InvalidTrustedHeader();
 
+    /// @notice Constructor.
+    /// @param _tendermintProgramVkey The public key of the Tendermint program.
+    /// @param _initialBlockHash The initial block hash.
+    /// @param _initialHeight The initial height.
+    /// @param _verifier The address of the SP1Verifier contract.
     constructor(
         bytes32 _tendermintProgramVkey,
         bytes32 _initialBlockHash,
@@ -23,6 +28,9 @@ contract SP1Tendermint {
         verifier = ISP1Verifier(_verifier);
     }
 
+    /// @notice Verifies a Tendermint proof.
+    /// @param proof The proof to verify.
+    /// @param publicValues The public values to verify the proof against.
     function verifyTendermintProof(
         bytes calldata proof,
         bytes calldata publicValues
