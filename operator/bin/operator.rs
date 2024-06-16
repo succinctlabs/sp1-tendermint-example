@@ -17,9 +17,10 @@ sol! {
     }
 }
 
-/// An implementation of a Tendermint Light Client operator that will poll the latest block from
-/// an onchain Tendermint light client. Then it will generate a proof of the latest block periodically
-/// and update the light client contract with the proof.
+/// An implementation of a Tendermint Light Client operator that will poll an onchain Tendermint
+/// light client and generate a proof of the transition from the latest block in the contract to the
+/// latest block on the chain. Then, submits the proof to the contract and updates the contract with
+/// the latest block hash and height.
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
