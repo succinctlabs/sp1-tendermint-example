@@ -23,10 +23,10 @@ async fn main() -> anyhow::Result<()> {
 
     let args = GenesisArgs::parse();
 
-    // Generate the vkey digest to use in the contract.
+    // Generate the vkey hash to use in the contract.
     let prover = MockProver::new();
     let (_, vk) = prover.setup(TENDERMINT_ELF);
-    println!("VKEY_DIGEST={}", vk.bytes32());
+    println!("TENDERMINT_VKEY_HASH={}", vk.bytes32());
 
     let tendermint_client = TendermintRPCClient::default();
 

@@ -14,11 +14,12 @@ contract SP1TendermintScript is Script {
 
     function setUp() public {}
 
+    // Deploy the SP1 Tendermint contract with the supplied initialization parameters.
     function run() public returns (address) {
         vm.startBroadcast();
 
-        // Read trusted initialization parameters from .env
-        bytes32 vkey = bytes32(vm.envBytes("VKEY_DIGEST"));
+        // Read the initialization parameters for the SP1 Tendermint contract.
+        bytes32 vkey = bytes32(vm.envBytes("TENDERMINT_VKEY_HASH"));
         uint64 trustedHeight = uint64(vm.envUint("TRUSTED_HEIGHT"));
         bytes32 trustedHeaderHash = bytes32(vm.envBytes("TRUSTED_HEADER_HASH"));
 

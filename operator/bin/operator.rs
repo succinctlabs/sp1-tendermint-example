@@ -17,9 +17,10 @@ sol! {
     }
 }
 
-/// An implementation of a Tendermint Light Client operator that will poll the latest block from
-/// an onchain Tendermint light client. Then it will generate a proof of the latest block periodically
-/// and update the light client contract with the proof.
+/// An implementation of a Tendermint Light Client operator that will poll an onchain Tendermint
+/// light client and generate a proof of the transition from the latest block in the contract to the
+/// latest block on the chain. Then, submits the proof to the contract and updates the contract with
+/// the latest block hash and height.
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
@@ -34,38 +35,40 @@ async fn main() -> anyhow::Result<()> {
 
     loop {
         // Read the existing trusted header hash from the contract.
-        let latest_height_call_data = SP1Tendermint::latestHeightCall {}.abi_encode();
-        let latest_height = contract_client.read(latest_height_call_data).await?;
-        let latest_height = U256::abi_decode(&latest_height, true).unwrap();
-        let trusted_block_height: u64 = latest_height.try_into().unwrap();
+        let contract_latest_height = SP1Tendermint::latestHeightCall {}.abi_encode();
+        let contract_latest_height = contract_client.read(contract_latest_height).await?;
+        let contract_latest_height = U256::abi_decode(&contract_latest_height, true).unwrap();
+        let trusted_block_height: u64 = contract_latest_height.try_into().unwrap();
 
-        // let latest_height: u64 = latest_height.try_into().unwrap();
         if trusted_block_height == 0 {
-            panic!("No trusted height found in the contract, likely using an outdated contract.");
+            panic!(
+                "No trusted height found on the contract. Something is wrong with the contract."
+            );
         }
 
-        let latest_block_height = tendermint_rpc_client.get_latest_block_height().await;
+        let chain_latest_block_height = tendermint_rpc_client.get_latest_block_height().await;
         let (trusted_light_block, target_light_block) = tendermint_rpc_client
-            .get_light_blocks(trusted_block_height, latest_block_height)
+            .get_light_blocks(trusted_block_height, chain_latest_block_height)
             .await;
+
+        // Generate a proof of the transition from the trusted block to the target block.
         let proof_data =
             prover.generate_tendermint_proof(&trusted_light_block, &target_light_block);
 
-        // Relay the proof to the contract.
+        // Construct the on-chain call and relay the proof to the contract.
         let proof_as_bytes = hex::decode(&proof_data.proof.encoded_proof).unwrap();
         let verify_tendermint_proof_call_data = SP1Tendermint::verifyTendermintProofCall {
             publicValues: proof_data.public_values.to_vec().into(),
             proof: proof_as_bytes.into(),
         }
         .abi_encode();
-
         contract_client
             .send(verify_tendermint_proof_call_data)
             .await?;
 
         info!(
             "Updated contract's latest block from {} to {}.",
-            trusted_block_height, latest_block_height
+            trusted_block_height, chain_latest_block_height
         );
 
         // Sleep for 60 seconds.

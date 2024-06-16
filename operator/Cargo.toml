@@ -16,7 +16,7 @@ name = "genesis"
 path = "bin/genesis.rs"
 
 [dependencies]
-sp1-sdk = { git = "https://github.com/succinctlabs/sp1.git", tag = "v1.0.4-testnet", features = [
+sp1-sdk = { git = "https://github.com/succinctlabs/sp1.git", tag = "v1.0.5-testnet", features = [
     "plonk",
 ] }
 reqwest = { version = "0.11", features = ["json"] }
