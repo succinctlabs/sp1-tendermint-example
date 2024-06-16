@@ -52,7 +52,13 @@ The SP1 Tendermint template is a simple example of a ZK Tendermint light client 
     CHAIN_ID=
     RPC_URL=
     CONTRACT_ADDRESS=
+    # Relaying to the contract.
     PRIVATE_KEY=
+
+    # If you're using the Succinct network, set SP1_PROVER to "network". Otherwise, set it to "local" or "mock".
+    SP1_PROVER=
+    # Only required if SP1_PROVER is set to "network".
+    SP1_PRIVATE_KEY=
     ```
 
 5. Run the Tendermint operator.
