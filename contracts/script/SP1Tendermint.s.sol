@@ -18,7 +18,7 @@ contract SP1TendermintScript is Script {
         vm.startBroadcast();
 
         // Read trusted initialization parameters from .env
-        bytes32 vkey = bytes32(vm.envBytes("VKEY_DIGEST"));
+        bytes32 vkey = bytes32(vm.envBytes("TENDERMINT_VKEY_HASH"));
         uint64 trustedHeight = uint64(vm.envUint("TRUSTED_HEIGHT"));
         bytes32 trustedHeaderHash = bytes32(vm.envBytes("TRUSTED_HEADER_HASH"));
 
