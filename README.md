@@ -19,17 +19,15 @@ The SP1 Tendermint template is a simple example of a ZK Tendermint light client 
 
     ```shell
     cd operator
-    cargo run --bin genesis --release
+    TENDERMINT_RPC_URL=https://rpc.celestia-mocha.com/ cargo run --bin genesis --release
     ```
 
-    This will output `TRUSTED_HEADER_HASH`, `TRUSTED_HEIGHT` and `TENDERMINT_VKEY_HASH`.
-
-2. Copy the initialization parameters from the output into the `contracts/.env` file:
+2. Copy the parameters from the output in the previous step into `contracts/.env`:
 
     ```shell
+    TENDERMINT_VKEY_HASH=<tendermint_vkey_hash>
     TRUSTED_HEADER_HASH=<trusted_header_hash>
     TRUSTED_HEIGHT=<trusted_height>
-    TENDERMINT_VKEY_HASH=<tendermint_vkey_hash>
     ```
 
 3. Deploy the `SP1Tendermint` contract with the initialization parameters:
@@ -47,12 +45,21 @@ The SP1 Tendermint template is a simple example of a ZK Tendermint light client 
     Error: Failed to get EIP-1559 fees    
     ```
 
-4. Add the configuration to the `/.env` file:
+4. Your deployed contract address will be printed to the terminal.
+
     ```shell
-    CHAIN_ID=
-    RPC_URL=
-    CONTRACT_ADDRESS=
-    # Relaying to the contract.
+    == Return ==
+    0: address <SP1_TENDERMINT_ADDRESS>
+    ```
+
+5. Add the configuration to the `.env` file:
+    ```shell
+    # Example configuration for Sepolia + Celestia Mocha.
+    TENDERMINT_RPC_URL=https://rpc.celestia-mocha.com/
+    CHAIN_ID=11155111
+    RPC_URL=https://ethereum-sepolia.publicnode.com/
+    CONTRACT_ADDRESS=<SP1_TENDERMINT_ADDRESS>
+    # Key for relaying to the contract.
     PRIVATE_KEY=
 
     # If you're using the Succinct network, set SP1_PROVER to "network". Otherwise, set it to "local" or "mock".
