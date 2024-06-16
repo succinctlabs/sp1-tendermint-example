@@ -34,20 +34,23 @@ async fn main() -> anyhow::Result<()> {
 
     loop {
         // Read the existing trusted header hash from the contract.
-        let latest_height_call_data = SP1Tendermint::latestHeightCall {}.abi_encode();
-        let latest_height = contract_client.read(latest_height_call_data).await?;
-        let latest_height = U256::abi_decode(&latest_height, true).unwrap();
-        let trusted_block_height: u64 = latest_height.try_into().unwrap();
+        let contract_latest_height = SP1Tendermint::latestHeightCall {}.abi_encode();
+        let contract_latest_height = contract_client.read(contract_latest_height).await?;
+        let contract_latest_height = U256::abi_decode(&contract_latest_height, true).unwrap();
+        let trusted_block_height: u64 = contract_latest_height.try_into().unwrap();
 
-        // let latest_height: u64 = latest_height.try_into().unwrap();
         if trusted_block_height == 0 {
-            panic!("No trusted height found in the contract, likely using an outdated contract.");
+            panic!(
+                "No trusted height found on the contract. Something is wrong with the contract."
+            );
         }
 
-        let latest_block_height = tendermint_rpc_client.get_latest_block_height().await;
+        let chain_latest_block_height = tendermint_rpc_client.get_latest_block_height().await;
         let (trusted_light_block, target_light_block) = tendermint_rpc_client
-            .get_light_blocks(trusted_block_height, latest_block_height)
+            .get_light_blocks(trusted_block_height, chain_latest_block_height)
             .await;
+
+        // Generate a proof of the transition from the trusted block to the target block.
         let proof_data =
             prover.generate_tendermint_proof(&trusted_light_block, &target_light_block);
 
@@ -65,7 +68,7 @@ async fn main() -> anyhow::Result<()> {
 
         info!(
             "Updated contract's latest block from {} to {}.",
-            trusted_block_height, latest_block_height
+            trusted_block_height, chain_latest_block_height
         );
 
         // Sleep for 60 seconds.
