@@ -37,7 +37,7 @@ The SP1 Tendermint template is a simple example of a ZK Tendermint light client 
 
     forge install
 
-    forge script script/SP1Tendermint.s.sol --rpc-url <RPC_URL> --private-key <PRIVATE_KEY> --etherscan-api-key <ETHERSCAN_API_KEY> --broadcast --verify
+    forge script script/SP1Tendermint.s.sol --rpc-url https://ethereum-sepolia.publicnode.com/ --private-key <PRIVATE_KEY> --broadcast
     ```
 
     If you see the following error, add `--legacy` to the command.

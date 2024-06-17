@@ -14,7 +14,7 @@ use std::env;
 pub struct ContractClient {
     chain_id: u64,
     client: SignerMiddleware<Provider<Http>, LocalWallet>,
-    contract: Address,
+    pub contract: Address,
 }
 
 impl Default for ContractClient {

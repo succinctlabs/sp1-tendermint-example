@@ -67,8 +67,8 @@ async fn main() -> anyhow::Result<()> {
             .await?;
 
         info!(
-            "Updated contract's latest block from {} to {}.",
-            trusted_block_height, chain_latest_block_height
+            "Updated the latest block of Tendermint light client at address {} from block {} to block {}.",
+            contract_client.contract, trusted_block_height, chain_latest_block_height
         );
 
         // Sleep for 60 seconds.
