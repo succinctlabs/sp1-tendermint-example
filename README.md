@@ -22,22 +22,17 @@ The SP1 Tendermint template is a simple example of a ZK Tendermint light client 
     TENDERMINT_RPC_URL=https://rpc.celestia-mocha.com/ cargo run --bin genesis --release
     ```
 
-2. Copy the parameters from the output in the previous step into `contracts/.env`:
+    This will show the tendermint vkey hash, trusted header hash, and trusted height, which you will
+    need to initialize the SP1 Tendermint contract.
 
-    ```shell
-    TENDERMINT_VKEY_HASH=<tendermint_vkey_hash>
-    TRUSTED_HEADER_HASH=<trusted_header_hash>
-    TRUSTED_HEIGHT=<trusted_height>
-    ```
-
-3. Deploy the `SP1Tendermint` contract with the initialization parameters:
+2. Deploy the `SP1Tendermint` contract with the initialization parameters:
 
     ```shell
     cd ../contracts
 
     forge install
 
-    forge script script/SP1Tendermint.s.sol --rpc-url https://ethereum-sepolia.publicnode.com/ --private-key <PRIVATE_KEY> --broadcast
+    TENDERMINT_VKEY_HASH=<tendermint_vkey_hash> TRUSTED_HEADER_HASH=<trusted_header_hash> TRUSTED_HEIGHT=<trusted_height> forge script script/SP1Tendermint.s.sol --rpc-url https://ethereum-sepolia.publicnode.com/ --private-key <PRIVATE_KEY> --broadcast
     ```
 
     If you see the following error, add `--legacy` to the command.
@@ -45,33 +40,32 @@ The SP1 Tendermint template is a simple example of a ZK Tendermint light client 
     Error: Failed to get EIP-1559 fees    
     ```
 
-4. Your deployed contract address will be printed to the terminal.
+3. Your deployed contract address will be printed to the terminal.
 
     ```shell
     == Return ==
     0: address <SP1_TENDERMINT_ADDRESS>
     ```
 
-5. Add the configuration to the `.env` file:
-    ```shell
-    # Example configuration for Sepolia + Celestia Mocha.
-    TENDERMINT_RPC_URL=https://rpc.celestia-mocha.com/
-    CHAIN_ID=11155111
-    RPC_URL=https://ethereum-sepolia.publicnode.com/
-    CONTRACT_ADDRESS=<SP1_TENDERMINT_ADDRESS>
-    # Key for relaying to the contract.
-    PRIVATE_KEY=
+    This will be used when you run the operator in step 5.
 
+4. Export your SP1 Prover Network configuration
+    ```shell
+    # Export the PRIVATE_KEY you will use to deploy the contract & relay proofs.
+    export PRIVATE_KEY=<PRIVATE_KEY>
+
+    # Optional
     # If you're using the Succinct network, set SP1_PROVER to "network". Otherwise, set it to "local" or "mock".
-    SP1_PROVER=
+    export SP1_PROVER={network|local|mock}
     # Only required if SP1_PROVER is set to "network".
-    SP1_PRIVATE_KEY=
+    export SP1_PRIVATE_KEY=<SP1_PRIVATE_KEY>
     ```
 
 5. Run the Tendermint operator.
     ```shell
     cd ../operator
-    RUST_LOG=info cargo run --bin operator --release
+
+    TENDERMINT_RPC_URL=https://rpc.celestia-mocha.com/ CHAIN_ID=11155111 RPC_URL=https://ethereum-sepolia.publicnode.com/ CONTRACT_ADDRESS=<SP1_TENDERMINT_ADDRESS> RUST_LOG=info cargo run --bin operator --release
     ```
 
 ## Contract Tests
