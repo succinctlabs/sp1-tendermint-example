@@ -64,7 +64,7 @@ The SP1 Tendermint template is a simple example of a ZK Tendermint light client 
 5. Run the Tendermint operator.
     ```shell
     cd ../operator
-    
+
     TENDERMINT_RPC_URL=https://rpc.celestia-mocha.com/ CHAIN_ID=11155111 RPC_URL=https://ethereum-sepolia.publicnode.com/ CONTRACT_ADDRESS=<SP1_TENDERMINT_ADDRESS> RUST_LOG=info cargo run --bin operator --release
     ```
 
