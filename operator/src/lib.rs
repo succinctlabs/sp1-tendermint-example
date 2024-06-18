@@ -1,4 +1,4 @@
-use sp1_sdk::{ProverClient, SP1PlonkBn254Proof, SP1ProvingKey, SP1Stdin, SP1VerifyingKey};
+use sp1_sdk::{ProverClient, SP1ProofWithPublicValues, SP1ProvingKey, SP1Stdin, SP1VerifyingKey};
 use tendermint_light_client_verifier::types::LightBlock;
 
 pub mod contract;
@@ -39,7 +39,7 @@ impl TendermintProver {
         &self,
         trusted_light_block: &LightBlock,
         target_light_block: &LightBlock,
-    ) -> SP1PlonkBn254Proof {
+    ) -> SP1ProofWithPublicValues {
         // Encode the light blocks to be input into our program.
         let encoded_1 = serde_cbor::to_vec(&trusted_light_block).unwrap();
         let encoded_2 = serde_cbor::to_vec(&target_light_block).unwrap();
@@ -52,12 +52,14 @@ impl TendermintProver {
         // Generate the proof. Depending on SP1_PROVER env variable, this may be a mock, local or network proof.
         let proof = self
             .prover_client
-            .prove_plonk(&self.pkey, stdin)
+            .prove(&self.pkey, stdin)
+            .plonk()
+            .run()
             .expect("proving failed");
 
         // Verify proof.
         self.prover_client
-            .verify_plonk(&proof, &self.vkey)
+            .verify(&proof, &self.vkey)
             .expect("Verification failed");
 
         // Return the proof.

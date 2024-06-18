@@ -73,13 +73,12 @@ async fn main() -> anyhow::Result<()> {
         target_height,
         vkey: tendermint_prover.vkey.bytes32(),
         public_values: proof_data.public_values.bytes(),
-        proof: proof_data.bytes(),
+        proof: proof_data.proof.try_as_plonk().unwrap().encoded_proof,
     };
 
     // Save the proof data to the file path.
     let fixture_path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(args.fixture_path);
 
-    // TODO: Change to prover.id
     let sp1_prover_type = env::var("SP1_PROVER");
     if sp1_prover_type.as_deref() == Ok("mock") {
         std::fs::write(
