@@ -26,28 +26,20 @@ async fn main() -> anyhow::Result<()> {
     // Generate the vkey hash to use in the contract.
     let prover = MockProver::new();
     let (_, vk) = prover.setup(TENDERMINT_ELF);
-    println!("TENDERMINT_VKEY_HASH={}", vk.bytes32());
-
     let tendermint_client = TendermintRPCClient::default();
 
-    if let Some(trusted_block) = args.trusted_block {
+    let (trusted_height, trusted_header_hash) = if let Some(trusted_block) = args.trusted_block {
         let commit = tendermint_client.get_commit(trusted_block).await?;
-        println!("TRUSTED_HEIGHT={}", trusted_block);
-        println!(
-            "TRUSTED_HEADER_HASH={}",
-            commit.result.signed_header.header.hash()
-        );
+        (trusted_block, commit.result.signed_header.header.hash())
     } else {
         let latest_commit = tendermint_client.get_latest_commit().await?;
-        println!(
-            "TRUSTED_HEIGHT={}",
-            latest_commit.result.signed_header.header.height.value()
-        );
-        println!(
-            "TRUSTED_HEADER_HASH={}",
-            latest_commit.result.signed_header.header.hash()
-        );
-    }
+        (
+            latest_commit.result.signed_header.header.height.value(),
+            latest_commit.result.signed_header.header.hash(),
+        )
+    };
+
+    println!("TENDERMINT_VKEY_HASH={} TRUSTED_HEIGHT={} TRUSTED_HEADER_HASH={}", vk.bytes32(), trusted_height, trusted_header_hash);
 
     Ok(())
 }
