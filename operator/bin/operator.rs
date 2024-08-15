@@ -56,7 +56,7 @@ async fn main() -> anyhow::Result<()> {
             prover.generate_tendermint_proof(&trusted_light_block, &target_light_block);
 
         // Construct the on-chain call and relay the proof to the contract.
-        let proof_as_bytes = hex::decode(&proof_data.proof.encoded_proof).unwrap();
+        let proof_as_bytes = hex::decode(&proof_data.bytes()).unwrap();
         let verify_tendermint_proof_call_data = SP1Tendermint::verifyTendermintProofCall {
             publicValues: proof_data.public_values.to_vec().into(),
             proof: proof_as_bytes.into(),
