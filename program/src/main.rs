@@ -42,9 +42,13 @@ fn main() {
 
     match verdict {
         Verdict::Success => {
-            println!("success");
+            println!(
+                "Verified light client update from height {} to height {}!",
+                light_block_1.signed_header.header.height.value(),
+                light_block_2.signed_header.header.height.value()
+            );
         }
-        v => panic!("expected success, got: {:?}", v),
+        v => panic!("Failed to verify light client update: {:?}", v),
     }
 
     // Now that we have verified our proof, we commit the header hashes to the zkVM to expose

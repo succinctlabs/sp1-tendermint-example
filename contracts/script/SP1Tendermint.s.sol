@@ -5,7 +5,6 @@ import "forge-std/console.sol";
 import {Script} from "forge-std/Script.sol";
 import {stdJson} from "forge-std/StdJson.sol";
 import {SP1Tendermint} from "../src/SP1Tendermint.sol";
-import {SP1Verifier} from "@sp1-contracts/SP1Verifier.sol";
 
 contract SP1TendermintScript is Script {
     using stdJson for string;
@@ -23,12 +22,16 @@ contract SP1TendermintScript is Script {
         uint64 trustedHeight = uint64(vm.envUint("TRUSTED_HEIGHT"));
         bytes32 trustedHeaderHash = bytes32(vm.envBytes("TRUSTED_HEADER_HASH"));
 
-        SP1Verifier verifier = new SP1Verifier();
+        // Deployed contract addresses: https://docs.succinct.xyz/onchain-verification/contract-addresses
+        address sp1VerifierGateway = address(
+            0x3B6041173B80E77f038f3F2C0f9744f04837185e
+        );
+
         tendermint = new SP1Tendermint(
             vkey,
             trustedHeaderHash,
             trustedHeight,
-            address(verifier)
+            sp1VerifierGateway
         );
         vm.stopBroadcast();
 

@@ -72,8 +72,8 @@ async fn main() -> anyhow::Result<()> {
         trusted_height,
         target_height,
         vkey: tendermint_prover.vkey.bytes32(),
-        public_values: proof_data.public_values.bytes(),
-        proof: proof_data.bytes(),
+        public_values: proof_data.public_values.raw(),
+        proof: hex::encode(proof_data.bytes()),
     };
 
     // Save the proof data to the file path.
