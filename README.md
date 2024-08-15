@@ -32,7 +32,7 @@ The SP1 Tendermint template is a simple example of a ZK Tendermint light client 
 
     forge install
 
-    TENDERMINT_VKEY_HASH=<tendermint_vkey_hash> TRUSTED_HEADER_HASH=<trusted_header_hash> TRUSTED_HEIGHT=<trusted_height> forge script script/SP1Tendermint.s.sol --rpc-url https://ethereum-sepolia.publicnode.com/ --private-key <PRIVATE_KEY> --broadcast
+    TENDERMINT_VKEY_HASH=<TENDERMINT_VKEY_HASH> TRUSTED_HEADER_HASH=<TRUSTED_HEADER_HASH> TRUSTED_HEIGHT=<TRUSTED_HEIGHT> forge script script/SP1Tendermint.s.sol --rpc-url https://ethereum-sepolia.publicnode.com/ --private-key <PRIVATE_KEY> --broadcast
     ```
 
     If you see the following error, add `--legacy` to the command.
