@@ -22,8 +22,8 @@ The SP1 Tendermint template is a simple example of a ZK Tendermint light client 
     TENDERMINT_RPC_URL=https://rpc.celestia-mocha.com/ cargo run --bin genesis --release
     ```
 
-    This will show the tendermint vkey hash, trusted header hash, and trusted height, which you will
-    need to initialize the SP1 Tendermint contract.
+    This will show the data for the genesis block as well as SP1 Tendermint program verification key
+    which you will need to initialize the SP1 Tendermint contract.
 
 2. Deploy the `SP1Tendermint` contract with the initialization parameters:
 
@@ -32,7 +32,7 @@ The SP1 Tendermint template is a simple example of a ZK Tendermint light client 
 
     forge install
 
-    TENDERMINT_VKEY_HASH=<tendermint_vkey_hash> TRUSTED_HEADER_HASH=<trusted_header_hash> TRUSTED_HEIGHT=<trusted_height> forge script script/SP1Tendermint.s.sol --rpc-url https://ethereum-sepolia.publicnode.com/ --private-key <PRIVATE_KEY> --broadcast
+    TENDERMINT_VKEY_HASH=<TENDERMINT_VKEY_HASH> TRUSTED_HEADER_HASH=<TRUSTED_HEADER_HASH> TRUSTED_HEIGHT=<TRUSTED_HEIGHT> forge script script/SP1Tendermint.s.sol --rpc-url https://ethereum-sepolia.publicnode.com/ --private-key <PRIVATE_KEY> --broadcast
     ```
 
     If you see the following error, add `--legacy` to the command.
@@ -54,10 +54,7 @@ The SP1 Tendermint template is a simple example of a ZK Tendermint light client 
     # Export the PRIVATE_KEY you will use to deploy the contract & relay proofs.
     export PRIVATE_KEY=<PRIVATE_KEY>
 
-    # Optional
-    # If you're using the Succinct network, set SP1_PROVER to "network". Otherwise, set it to "local" or "mock".
-    export SP1_PROVER={network|local|mock}
-    # Only required if SP1_PROVER is set to "network".
+    # To use the Succinct proving network, set `SP1_PRIVATE_KEY` to your private key on the proving network.
     export SP1_PRIVATE_KEY=<SP1_PRIVATE_KEY>
     ```
 
@@ -65,7 +62,7 @@ The SP1 Tendermint template is a simple example of a ZK Tendermint light client 
     ```shell
     cd ../operator
 
-    TENDERMINT_RPC_URL=https://rpc.celestia-mocha.com/ CHAIN_ID=11155111 RPC_URL=https://ethereum-sepolia.publicnode.com/ CONTRACT_ADDRESS=<SP1_TENDERMINT_ADDRESS> RUST_LOG=info cargo run --bin operator --release
+    SP1_PROVER=network TENDERMINT_RPC_URL=https://rpc.celestia-mocha.com/ CHAIN_ID=11155111 RPC_URL=https://ethereum-sepolia.publicnode.com/ CONTRACT_ADDRESS=<SP1_TENDERMINT_ADDRESS> RUST_LOG=info cargo run --bin operator --release
     ```
 
 ## Contract Tests
@@ -76,7 +73,7 @@ To generate fixtures for local testing run:
 ```shell
 # Generates fixture.json (valid proof)
 $ cd operator
-$ RUST_LOG=info TENDERMINT_RPC_URL="https://rpc.celestia-mocha.com/" cargo run --bin fixture --release -- --trusted-block 500 --target-block 1000
+$ RUST_LOG=info SP1_PROVER=network TENDERMINT_RPC_URL="https://rpc.celestia-mocha.com/" cargo run --bin fixture --release -- --trusted-block 500 --target-block 1000
 
 # Generates mock_fixture.json (mock proof)
 $ cd operator
