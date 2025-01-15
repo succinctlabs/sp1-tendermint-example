@@ -4,7 +4,7 @@ fn main() {
     build_program_with_args(
         "../program",
         BuildArgs {
-            elf_name: "tendermint-light-client".to_string(),
+            elf_name: Some("tendermint-light-client".to_string()),
             ..Default::default()
         },
     )

@@ -1,5 +1,5 @@
 use clap::Parser;
-use sp1_sdk::{utils::setup_logger, HashableKey, MockProver, Prover};
+use sp1_sdk::{utils::setup_logger, CpuProver, HashableKey, Prover};
 use tendermint_operator::{util::TendermintRPCClient, TENDERMINT_ELF};
 
 #[derive(Parser, Debug)]
@@ -24,7 +24,7 @@ async fn main() -> anyhow::Result<()> {
     let args = GenesisArgs::parse();
 
     // Generate the vkey hash to use in the contract.
-    let prover = MockProver::new();
+    let prover = CpuProver::mock();
     let (_, vk) = prover.setup(TENDERMINT_ELF);
     let tendermint_client = TendermintRPCClient::default();
 
@@ -39,7 +39,12 @@ async fn main() -> anyhow::Result<()> {
         )
     };
 
-    println!("TENDERMINT_VKEY_HASH={} TRUSTED_HEIGHT={} TRUSTED_HEADER_HASH={}", vk.bytes32(), trusted_height, trusted_header_hash);
+    println!(
+        "TENDERMINT_VKEY_HASH={} TRUSTED_HEIGHT={} TRUSTED_HEADER_HASH={}",
+        vk.bytes32(),
+        trusted_height,
+        trusted_header_hash
+    );
 
     Ok(())
 }

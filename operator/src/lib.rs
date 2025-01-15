@@ -1,4 +1,6 @@
-use sp1_sdk::{ProverClient, SP1ProofWithPublicValues, SP1ProvingKey, SP1Stdin, SP1VerifyingKey};
+use sp1_sdk::{
+    EnvProver, ProverClient, SP1ProofWithPublicValues, SP1ProvingKey, SP1Stdin, SP1VerifyingKey,
+};
 use tendermint_light_client_verifier::types::LightBlock;
 
 pub mod contract;
@@ -9,7 +11,7 @@ pub mod util;
 pub const TENDERMINT_ELF: &[u8] = include_bytes!("../../program/elf/tendermint-light-client");
 
 pub struct TendermintProver {
-    pub prover_client: ProverClient,
+    pub prover_client: EnvProver,
     pub pkey: SP1ProvingKey,
     pub vkey: SP1VerifyingKey,
 }
@@ -23,7 +25,7 @@ impl Default for TendermintProver {
 impl TendermintProver {
     pub fn new() -> Self {
         log::info!("Initializing SP1 ProverClient...");
-        let prover_client = ProverClient::new();
+        let prover_client = ProverClient::from_env();
         let (pkey, vkey) = prover_client.setup(TENDERMINT_ELF);
         log::info!("SP1 ProverClient initialized");
         Self {
@@ -52,7 +54,7 @@ impl TendermintProver {
         // Generate the proof. Depending on SP1_PROVER env variable, this may be a mock, local or network proof.
         let proof = self
             .prover_client
-            .prove(&self.pkey, stdin)
+            .prove(&self.pkey, &stdin)
             .plonk()
             .run()
             .expect("Failed to execute.");

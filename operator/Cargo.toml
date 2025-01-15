@@ -16,13 +16,13 @@ name = "genesis"
 path = "bin/genesis.rs"
 
 [dependencies]
-sp1-sdk = "2.0.0"
+sp1-sdk = "4.0.0"
 reqwest = { version = "0.11", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 serde = { version = "1.0", default-features = false, features = ["derive"] }
-tendermint = { version = "0.35.0", default-features = false }
-tendermint-light-client-verifier = { version = "0.35.0", default-features = false, features = [
+tendermint = { version = "0.40.0", default-features = false }
+tendermint-light-client-verifier = { version = "0.40.0", default-features = false, features = [
     "rust-crypto",
 ] }
 alloy-sol-types = "0.7"
@@ -41,4 +41,4 @@ async-trait = "0.1.80"
 hex = "0.4.3"
 
 [build-dependencies]
-sp1-helper = "2.0.0"
+sp1-helper = "4.0.0"
