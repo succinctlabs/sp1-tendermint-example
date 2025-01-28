@@ -2,6 +2,11 @@
 
 An example of a Tendermint light client on Ethereum powered by SP1.
 
+> [!CAUTION]
+>
+> This repository is still an active work-in-progress and is not audited or meant for production usage.
+
+
 ## Overview
 
 The SP1 Tendermint template is a simple example of a ZK Tendermint light client on Ethereum powered by SP1. It demonstrates how to use SP1 to generate a proof of the update between two Tendermint headers and verify it on Ethereum.
