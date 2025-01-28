@@ -22,7 +22,7 @@ contract SP1TendermintScript is Script {
         uint64 trustedHeight = uint64(vm.envUint("TRUSTED_HEIGHT"));
         bytes32 trustedHeaderHash = bytes32(vm.envBytes("TRUSTED_HEADER_HASH"));
 
-        // Deployed contract addresses: https://docs.succinct.xyz/onchain-verification/contract-addresses
+        // Deployed contract addresses: https://docs.succinct.xyz/docs/verification/onchain/contract-addresses
         address sp1VerifierGateway = address(
             0x3B6041173B80E77f038f3F2C0f9744f04837185e
         );
