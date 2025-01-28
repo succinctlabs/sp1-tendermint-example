@@ -32,6 +32,13 @@ fn main() {
         trusting_period: Duration::from_secs(14 * 24 * 60 * 60),
         clock_drift: Default::default(),
     };
+
+    // Verify update header doesn't check this property.
+    assert_eq!(
+        light_block_1.next_validators.hash(),
+        light_block_1.as_trusted_state().next_validators_hash
+    );
+
     let verify_time = light_block_2.time() + Duration::from_secs(20);
     let verdict = vp.verify_update_header(
         light_block_2.as_untrusted_state(),
