@@ -83,7 +83,7 @@ contract SP1TendermintTest is Test {
     }
 
     // Confirm that submitting an empty proof fails.
-    function testFail_InvalidTendermint() public {
+    function testRevert_InvalidTendermint() public {
         SP1TendermintFixtureJson memory fixture = loadFixture("fixture.json");
 
         // Create a fake proof.
@@ -107,7 +107,7 @@ contract SP1TendermintTest is Test {
 
     // Confirm that submitting a non-empty proof with the mock verifier fails. This typically
     // indicates that the user has passed in a real proof to the mock verifier.
-    function testFail_Invalid_MockTendermint() public {
+    function testRevert_Invalid_MockTendermint() public {
         SP1TendermintFixtureJson memory fixture = loadFixture(
             "mock_fixture.json"
         );
