@@ -52,7 +52,7 @@ contract SP1Tendermint {
         // If the inputs to the proof don't match the latest header in the contract, don't update
         // the contract state.
         if (
-            trustedHeaderHash != latestHeader && trustedHeight != latestHeight
+            trustedHeaderHash != latestHeader || trustedHeight != latestHeight
         ) {
             revert InvalidTrustedHeader();
         }
