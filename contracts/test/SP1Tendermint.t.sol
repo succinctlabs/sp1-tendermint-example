@@ -83,13 +83,20 @@ contract SP1TendermintTest is Test {
     }
 
     // Confirm that submitting an empty proof fails.
-    function testRevert_InvalidTendermint() public {
+    function testRevert_InvalidTendermintProof() public {
         SP1TendermintFixtureJson memory fixture = loadFixture("fixture.json");
 
         // Create a fake proof.
         bytes memory fakeProof = new bytes(fixture.proof.length);
 
         // Create fixture of the length of the proof bytes.
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                SP1Verifier.WrongVerifierSelector.selector,
+                bytes4(0),
+                bytes4(0xc430ff7f)
+            )
+        );
         tendermint.verifyTendermintProof(fakeProof, fixture.publicValues);
     }
 
@@ -100,19 +107,6 @@ contract SP1TendermintTest is Test {
         );
 
         mockTendermint.verifyTendermintProof(bytes(""), fixture.publicValues);
-
-        assert(mockTendermint.latestHeader() == fixture.targetHeaderHash);
-        assert(mockTendermint.latestHeight() == fixture.targetHeight);
-    }
-
-    // Confirm that submitting a non-empty proof with the mock verifier fails. This typically
-    // indicates that the user has passed in a real proof to the mock verifier.
-    function testRevert_Invalid_MockTendermint() public {
-        SP1TendermintFixtureJson memory fixture = loadFixture(
-            "mock_fixture.json"
-        );
-
-        mockTendermint.verifyTendermintProof(bytes("aa"), fixture.publicValues);
 
         assert(mockTendermint.latestHeader() == fixture.targetHeaderHash);
         assert(mockTendermint.latestHeight() == fixture.targetHeight);
