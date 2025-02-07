@@ -1,11 +1,10 @@
 name: "PR"
 
 on:
+  push:
+    branches: [ main ]
   pull_request:
-    types:
-      - opened
-      - edited
-      - synchronize
+    branches: [ main ]
 
 permissions:
   pull-requests: read
