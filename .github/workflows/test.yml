@@ -33,16 +33,11 @@ jobs:
           forge install
         id: install
 
-      - name: Clean Foundry cache
-        run: |
-          cd contracts
-          forge clean
-        id: clean
-
       - name: Run Forge build
         run: |
           cd contracts
           forge --version
+          forge clean
           forge build --sizes
         id: build
 
