@@ -1,11 +1,10 @@
-name: test
+name: "Forge Tests"
 
 on:
-  pull_request_target:
-    types:
-      - opened
-      - edited
-      - synchronize
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 env:
   FOUNDRY_PROFILE: ci
@@ -15,17 +14,18 @@ jobs:
     strategy:
       fail-fast: true
 
-    name: Foundry project
-    runs-on: ubuntu-latest
+    name: Run Forge tests
+    runs-on:
+      - runs-on=${{ github.run_id }}
+      - runner=2cpu-linux-x64
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.ref }}
           submodules: recursive
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: nightly
 
       - name: Run Forge install
         run: |
@@ -38,6 +38,7 @@ jobs:
         run: |
           cd contracts
           forge --version
+          forge clean
           forge build --sizes
         id: build
 

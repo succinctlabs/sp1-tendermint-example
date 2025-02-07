@@ -4,7 +4,9 @@ sp1_zkvm::entrypoint!(main);
 use alloy_sol_types::{sol, SolValue};
 use core::time::Duration;
 use tendermint_light_client_verifier::{
-    options::Options, types::LightBlock, ProdVerifier, Verdict, Verifier,
+    options::Options,
+    types::{LightBlock, TrustThreshold},
+    ProdVerifier, Verdict, Verifier,
 };
 
 sol! {
@@ -27,7 +29,7 @@ fn main() {
 
     let vp = ProdVerifier::default();
     let opt = Options {
-        trust_threshold: Default::default(),
+        trust_threshold: TrustThreshold::TWO_THIRDS,
         // 2 week trusting period.
         trusting_period: Duration::from_secs(14 * 24 * 60 * 60),
         clock_drift: Default::default(),
