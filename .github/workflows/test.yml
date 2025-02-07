@@ -37,6 +37,7 @@ jobs:
         run: |
           cd contracts
           forge clean
+        id: clean
 
       - name: Run Forge build
         run: |
